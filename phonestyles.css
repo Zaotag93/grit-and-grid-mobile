@@ -24,7 +24,7 @@ input, textarea {
 
 /* Widen the skill bonus input boxes specifically */
 input[id^="bon_"] {
-    width: 45px !important;
+    width: 60px !important;
     text-align: center;
 }
 
