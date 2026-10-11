@@ -1,24 +1,21 @@
 // --- MOBILE APP 4-TAB MANAGER ---
 function switchTab(tabName) {
-    // Hide all tabs
     document.getElementById('tab_sheet').classList.remove('active-tab');
     document.getElementById('tab_inv').classList.remove('active-tab');
     document.getElementById('tab_magic').classList.remove('active-tab');
     document.getElementById('tab_ref').classList.remove('active-tab');
 
-    // Remove active state from buttons
     document.getElementById('tab_btn_sheet').classList.remove('active');
     document.getElementById('tab_btn_inv').classList.remove('active');
     document.getElementById('tab_btn_magic').classList.remove('active');
     document.getElementById('tab_btn_ref').classList.remove('active');
 
-    // Show target tab and highlight button
     document.getElementById('tab_' + tabName).classList.add('active-tab');
     document.getElementById('tab_btn_' + tabName).classList.add('active');
 }
 
 // --- GRIT & GRID SLOT MANAGEMENT ---
-let lastProfession = "";
+let lastProfession = ""; 
 
 function getActiveSlotKey() {
     const slotSelect = document.getElementById('charSlotSelect');
@@ -220,16 +217,16 @@ function updateBackpackNotes() {
     const a2 = document.getElementById('inv_attach2').value;
     const notesBox = document.getElementById('backpack_notes');
     const bpDict = {
-        "Exterior Cargo Loops": "Adds 4 exterior lash-points. Inaccessible in combat.",
-        "Sconce Rig": "Hands-free 360 light. Ruins stealth.",
-        "Iron-Plate Baffle": "Absorbs rear hits (-1 slot Wear Tax).",
+        "Exterior Cargo Loops": "Adds 4 exterior lash-points. Cannot be accessed in combat.",
+        "Sconce Rig": "Hands-free 360 light. Ruins stealth checks entirely.",
+        "Iron-Plate Baffle": "Absorbs rear hits, reducing Wear Tax damage to internals by 1 slot.",
         "Oiled-Hide Water-Seal": "Protects against slime/rot. If punctured, traps moisture.",
-        "Quiver-Latch": "Carry heavy secondary. Drawing takes extra action.",
-        "Apothecary Tray": "Prevents vials shattering. Takes 2 internal slots.",
-        "Bedroll & Camp Sling": "Shifts center of gravity downward.",
-        "Drop-Away Release": "Instantly drop pack in emergencies.",
-        "Signal-Bell": "Tripwire camp alarm. Minor stealth penalty.",
-        "Scavenger Hook": "Keeps harvest clean. Attracts predators."
+        "Quiver-Latch": "Carry heavy secondary without holding it. Drawing takes extra action.",
+        "Apothecary Tray": "Prevents vials shattering. Takes 2 internal slots permanently.",
+        "Bedroll & Camp Sling": "Shifts center of gravity downward. Makes pack physically taller/wider.",
+        "Drop-Away Release": "Instantly drop backpack in emergencies. Your gear is left behind.",
+        "Signal-Bell": "String wire around camp. Constant minor penalty to stealth.",
+        "Scavenger Hook": "Keeps harvest clean. Retains organic musk, attracts predators."
     };
     let result = "";
     if (a1 !== "None" && bpDict[a1]) result += "1. " + bpDict[a1] + "\n";
@@ -258,14 +255,14 @@ function calcSkills() {
     const getVal = (id) => parseInt(document.getElementById(id).value) || 0;
     const str = getVal('stat_str'), dex = getVal('stat_dex'), int = getVal('stat_int');
     const wis = getVal('stat_wis'), con = getVal('stat_con'), cha = getVal('stat_cha');
-
+    
     const skills = [
         { id: 'cqc', stat: str }, { id: 'shi', stat: dex }, { id: 'arm', stat: con }, { id: 'ran', stat: dex },
         { id: 'fai', stat: str }, { id: 'med', stat: int }, { id: 'res', stat: wis }, { id: 'voi', stat: int },
         { id: 'tra', stat: wis }, { id: 'loc', stat: dex }, { id: 'sne', stat: dex }, { id: 'trk', stat: wis },
         { id: 'arc', stat: wis }, { id: 'scr', stat: int }, { id: 'stf', stat: dex }, { id: 'app', stat: int }
     ];
-
+    
     skills.forEach(sk => {
         const baseSpan = document.getElementById(`b_${sk.id}`);
         const totalSpan = document.getElementById(`t_${sk.id}`);
@@ -277,6 +274,7 @@ function calcSkills() {
     });
 }
 
+// --- EQUIPMENT & SPELL REFERENCE DICTIONARY ---
 function showRefCategory() {
     const cat = document.getElementById('ref_categorySelect').value;
     const container = document.getElementById('store_container');
@@ -285,89 +283,137 @@ function showRefCategory() {
     if (cat === 'glossary') {
         html = `
         <table class="store-table">
-            <tr><th>Rule / Term</th><th>Definition</th></tr>
-            <tr><td><b>Wear Tax</b></td><td>Units digit 2, 3, or 4 on hit = Weapon Notch (-1 Dmg). Broken at 3.</td></tr>
-            <tr><td><b>Blinding Dark</b></td><td>-20% physical checks, monsters gain +20% accuracy.</td></tr>
-            <tr><td><b>Subdual Damage</b></td><td>Non-lethal drain. 0 HP drops contractor unconscious for 3 rounds.</td></tr>
-            <tr><td><b>Infection</b></td><td>Failed CON vs filth. No natural healing, lose 1 HP daily.</td></tr>
+            <tr><th>Rule / Term</th><th>Mechanical Definition</th></tr>
+            <tr><td><b>Wear Tax</b></td><td>If units digit of successful melee hit is 2, 3, or 4, weapon takes Notch (-1 Dmg). Broken at 3 Notches.</td></tr>
+            <tr><td><b>Blinding Dark</b></td><td>No light. -20% to physical actions. Native monsters gain surprise & +20% accuracy.</td></tr>
+            <tr><td><b>Subdual Damage</b></td><td>Non-lethal drain. Reaching 0 HP drops contractor unconscious for 3 rounds, waking with Lethargy (-20% move/checks).</td></tr>
+            <tr><td><b>Infection</b></td><td>Failed CON check vs filth. No natural healing, lose 1 HP daily. Needs Antidote.</td></tr>
+            <tr><td><b>Cognitive Strain</b></td><td>Migraine from magic fail. -20% all checks, -2 AC DR, half speed. Needs 4 hours rest.</td></tr>
         </table>`;
     }
     else if (cat === 'melee') {
         html = `
         <table class="store-table">
-            <tr><th>Weapon</th><th>Dmg</th><th>Cost</th><th>Notes</th></tr>
-            <tr><td>Improvised</td><td>2</td><td>-</td><td>Shatters on any Notch.</td></tr>
-            <tr><td>Dagger</td><td>4</td><td>5 gp</td><td>Easily concealed.</td></tr>
-            <tr><td>Shortsword</td><td>6</td><td>15 gp</td><td>Standard sidearm.</td></tr>
-            <tr><td>Mace / Warhammer</td><td>7</td><td>25 gp</td><td>Cathedral sanctioned blunt.</td></tr>
-            <tr><td>Battleaxe</td><td>8</td><td>40 gp</td><td>Heavy.</td></tr>
-            <tr><td>Guild Halberd</td><td>10</td><td>75 gp</td><td>Heavy. Reach.</td></tr>
+            <tr><th>Rank Gate</th><th>Weapon</th><th>Max Dmg</th><th>Cost</th><th>Notes</th></tr>
+            <tr><td>10</td><td>Improvised (Rock/Shiv)</td><td>2</td><td>-</td><td>Shatters on any Notch (2,3,4)</td></tr>
+            <tr><td>10</td><td>Dagger / Stiletto</td><td>4</td><td>5 gp</td><td>Easily concealed</td></tr>
+            <tr><td>10</td><td>Fist-Blade / Cestus</td><td>3</td><td>12 gp</td><td>Leaves hand free, cannot be dropped</td></tr>
+            <tr><td>10</td><td>Iron Pick / Handaxe</td><td>5</td><td>8 gp</td><td>Climbing/Breaching tool</td></tr>
+            <tr><td>10</td><td>Shortsword / Machete</td><td>6</td><td>15 gp</td><td>Standard sidearm</td></tr>
+            <tr><td>10</td><td>Spear / Pitchfork</td><td>6</td><td>10 gp</td><td>Reach (Attack behind vanguard)</td></tr>
+            <tr><td>10</td><td>Mace / Warhammer</td><td>7</td><td>25 gp</td><td>Cathedral sanctioned blunt</td></tr>
+            <tr><td>8</td><td>Heavy Footman's Mace</td><td>7</td><td>30 gp</td><td>Heavy. Crushing momentum</td></tr>
+            <tr><td>8</td><td>Battleaxe / Longsword</td><td>8</td><td>40 gp</td><td>Heavy.</td></tr>
+            <tr><td>8</td><td>Guild Halberd</td><td>10</td><td>75 gp</td><td>Heavy. Reach.</td></tr>
+            <tr><td>6</td><td>Master-Forged Estoc</td><td>8</td><td>120 gp</td><td>Bypasses 1 pt of armor DR on hit</td></tr>
+            <tr><td>5</td><td>Vanguard Poleaxe</td><td>10</td><td>350 gp</td><td>Heavy. Reach. Ultimate hybrid weapon</td></tr>
         </table>`;
     }
     else if (cat === 'ranged') {
         html = `
         <table class="store-table">
-            <tr><th>Weapon</th><th>Dmg</th><th>Cost</th><th>Notes</th></tr>
-            <tr><td>Hunting Shortbow</td><td>5</td><td>25 gp</td><td>60 ft range. Two hands.</td></tr>
-            <tr><td>Composite Recurve</td><td>6</td><td>50 gp</td><td>Requires STR 40%.</td></tr>
-            <tr><td>Scavenged Crossbow</td><td>6</td><td>45 gp</td><td>1 action reload. Pierces 1 DR.</td></tr>
+            <tr><th>Rank Gate</th><th>Weapon</th><th>Max Dmg</th><th>Cost</th><th>Notes</th></tr>
+            <tr><td>10</td><td>Hunting Shortbow</td><td>5</td><td>25 gp</td><td>60 ft range. Two hands.</td></tr>
+            <tr><td>10</td><td>Composite Recurve</td><td>6</td><td>50 gp</td><td>Requires STR 40% to draw</td></tr>
+            <tr><td>10</td><td>Scavenged Crossbow</td><td>6</td><td>45 gp</td><td>1 action reload. Pierces 1 DR</td></tr>
+            <tr><td>10</td><td>Quiver (10 Arrows/Bolts)</td><td>-</td><td>5 sp</td><td>Bundled ammunition</td></tr>
+            <tr><td>8</td><td>Heavy Arbalest</td><td>8</td><td>90 gp</td><td>2 actions reload. Pierces heavy armor/shields</td></tr>
+            <tr><td>5</td><td>Siege Crossbow</td><td>9</td><td>400 gp</td><td>2 actions reload. Ignores shields entirely</td></tr>
         </table>`;
     }
     else if (cat === 'armor') {
         html = `
         <table class="store-table">
-            <tr><th>Armor Type</th><th>DR</th><th>Cost</th><th>Notes</th></tr>
-            <tr><td>Thick Rags</td><td>1</td><td>10 gp</td><td>Standard issue.</td></tr>
-            <tr><td>Boiled Leather</td><td>2</td><td>30 gp</td><td>Lightweight.</td></tr>
-            <tr><td>Chain Mail</td><td>3</td><td>75 gp</td><td>Heavy. Sprint/climb penalty.</td></tr>
-            <tr><td>Splint Mail</td><td>4</td><td>150 gp</td><td>Heavy. -20% Sneak.</td></tr>
+            <tr><th>Rank Gate</th><th>Armor Type</th><th>AC (DR)</th><th>Cost</th><th>Notes</th></tr>
+            <tr><td>10</td><td>Thick Rags</td><td>1</td><td>10 gp</td><td>Standard issue</td></tr>
+            <tr><td>10</td><td>Boiled Leather</td><td>2</td><td>30 gp</td><td>Reliable lightweight</td></tr>
+            <tr><td>10</td><td>Chain Mail</td><td>3</td><td>75 gp</td><td>Heavy. Penalty to sprint/swim/climb</td></tr>
+            <tr><td>8</td><td>Splint / Scale Mail</td><td>4</td><td>150 gp</td><td>Heavy. -20% to Sneak</td></tr>
+            <tr><td>7</td><td>Sapphire Cuirass</td><td>3</td><td>220 gp</td><td>Cold-iron plate. No heavy penalty</td></tr>
+            <tr><td>5</td><td>Ruby-Etched Scale</td><td>4</td><td>450 gp</td><td>Acid & rust-spore immune</td></tr>
+            <tr><td>4</td><td>Guild-Forged Plate</td><td>5</td><td>400 gp</td><td>Heavy. -20% Sneak, -10% Dodge</td></tr>
         </table>`;
     }
     else if (cat === 'shields') {
         html = `
         <table class="store-table">
-            <tr><th>Shield Type</th><th>Cost</th><th>Function</th></tr>
-            <tr><td>Reinforced Buckler</td><td>20 gp</td><td>Splinters if damage > 3.</td></tr>
-            <tr><td>Wooden Target</td><td>15 gp</td><td>Splinters if damage > 5.</td></tr>
-            <tr><td>Wooden Vanguard</td><td>75 gp</td><td>Planted cover. Splinters > 12.</td></tr>
+            <tr><th>Rank Gate</th><th>Shield Type</th><th>Cost</th><th>Splinter Threshold & Function</th></tr>
+            <tr><td>10</td><td>Reinforced Buckler</td><td>20 gp</td><td>Splinters if hit exceeds 3 dmg</td></tr>
+            <tr><td>10</td><td>Spiked Punching</td><td>35 gp</td><td>Functions as weapon (Max 4). Splinters > 4 dmg</td></tr>
+            <tr><td>10</td><td>Wooden Target</td><td>15 gp</td><td>Splinters if hit exceeds 5 dmg</td></tr>
+            <tr><td>8</td><td>Vanguard Tower</td><td>75 gp</td><td>Massive front cover. Splinters > 12 dmg. Flammable.</td></tr>
+            <tr><td>5</td><td>Iron Tower Shield</td><td>120 gp</td><td>Indestructible Bulwark (> 16 dmg). -10% to all Dodge checks.</td></tr>
         </table>`;
     }
     else if (cat === 'logistics') {
         html = `
         <table class="store-table">
-            <tr><th>Item</th><th>Cost</th><th>Utility</th></tr>
-            <tr><td>Iron Spikes (12)</td><td>1 gp</td><td>Wedges doors shut.</td></tr>
-            <tr><td>Hemp Rope (50ft)</td><td>1 gp</td><td>Supports 300 lbs.</td></tr>
-            <tr><td>Caltrops (20)</td><td>1 gp</td><td>Halts pursuers, 1 dmg.</td></tr>
-            <tr><td>Grappling Hook</td><td>1 gp</td><td>Secures rope over chasms.</td></tr>
+            <tr><th>Item & Unit</th><th>Cost / Slot</th><th>Field Utility</th></tr>
+            <tr><td>Iron Spikes (12)</td><td>1 gp / 1</td><td>Wedges doors shut</td></tr>
+            <tr><td>Hemp Rope (50ft)</td><td>1 gp / 1</td><td>300 lbs. Roll DEX to climb unknotted.</td></tr>
+            <tr><td>Silk Rope (50ft)</td><td>10 gp / 0.5</td><td>400 lbs. Silent and rot-resistant.</td></tr>
+            <tr><td>Caltrops (20)</td><td>1 gp / 1</td><td>1 flat dmg & halts unarmored pursuers.</td></tr>
+            <tr><td>Marbles (100)</td><td>5 sp / 1</td><td>DEX check or fall prone on smooth stone.</td></tr>
+            <tr><td>Flour Sack</td><td>2 sp / 1</td><td>Reveals invisible predators or drafts.</td></tr>
+            <tr><td>Grease Pot</td><td>3 sp / 1</td><td>Silences hinges (+20% sneak) or makes fire slick.</td></tr>
+            <tr><td>Scent Flask</td><td>2 gp / 0.5</td><td>Masks human scent (-20% to wolf tracking).</td></tr>
+            <tr><td>Grappling Hook</td><td>1 gp / 1</td><td>Secures rope over chasms (DEX check).</td></tr>
+            <tr><td>Empty Vials (3)</td><td>1 gp / 0.5</td><td>Harvests biological monster salvage.</td></tr>
         </table>`;
     }
     else if (cat === 'backpack') {
         html = `
         <table class="store-table">
-            <tr><th>Attachment</th><th>Cost</th><th>Effect</th></tr>
-            <tr><td>Cargo Loops</td><td>30 sp</td><td>4 exterior lash-points.</td></tr>
-            <tr><td>Sconce Rig</td><td>20 sp</td><td>Hands-free light. Ruins stealth.</td></tr>
-            <tr><td>Iron-Plate Baffle</td><td>50 sp</td><td>Absorbs rear Wear Tax hits.</td></tr>
+            <tr><th>Attachment</th><th>Cost</th><th>Function & Trade-Off</th></tr>
+            <tr><td>Exterior Cargo Loops</td><td>30 sp</td><td><b>Function:</b> Adds 4 exterior lash-points. <b>Trade-Off:</b> Inaccessible during combat, prime target.</td></tr>
+            <tr><td>Sconce Rig</td><td>20 sp</td><td><b>Function:</b> Rigid iron swing-arm for lantern/torch. <b>Trade-Off:</b> Ruins stealth.</td></tr>
+            <tr><td>Iron-Plate Baffle</td><td>50 sp</td><td><b>Function:</b> Cold iron riveted to back. Absorbs rear hits (-1 slot Wear Tax). <b>Trade-Off:</b> Adds base weight.</td></tr>
+            <tr><td>Oiled-Hide Water-Seal</td><td>40 sp</td><td><b>Function:</b> Seamless pigskin bladder. <b>Trade-Off:</b> If punctured, traps moisture and ruins dry rations.</td></tr>
+            <tr><td>Quiver-Latch</td><td>25 sp</td><td><b>Function:</b> Side-mounted sleeves for secondary weapon. <b>Trade-Off:</b> Drawing takes an extra tactical action.</td></tr>
+            <tr><td>Apothecary Tray</td><td>45 sp</td><td><b>Function:</b> Prevents vials from shattering. <b>Trade-Off:</b> Takes 2 internal slots permanently.</td></tr>
+            <tr><td>Bedroll & Camp Sling</td><td>20 sp</td><td><b>Function:</b> Shifts center of gravity downward. <b>Trade-Off:</b> Makes pack physically taller and wider.</td></tr>
+            <tr><td>Drop-Away Release</td><td>35 sp</td><td><b>Function:</b> Instantly drop backpack. <b>Trade-Off:</b> Your gear is left behind.</td></tr>
+            <tr><td>Signal-Bell</td><td>25 sp</td><td><b>Function:</b> String wire around camp, grants wake-up check. <b>Trade-Off:</b> Constant minor penalty to stealth.</td></tr>
+            <tr><td>Scavenger Hook</td><td>30 sp</td><td><b>Function:</b> Keeps harvest clean. <b>Trade-Off:</b> Retains organic musk, attracts predators.</td></tr>
         </table>`;
     }
     else if (cat === 'arcane') {
         html = `
         <table class="store-table">
-            <tr><th>Lvl</th><th>Spell</th><th>Effect</th></tr>
-            <tr><td>0</td><td>Spark</td><td>Ignites flammable objects instantly.</td></tr>
-            <tr><td>0</td><td>Murmur</td><td>Projects whisper 30 ft.</td></tr>
-            <tr><td>1</td><td>Aether Dart</td><td>Auto-hits for 4 dmg, bypasses DR.</td></tr>
-            <tr><td>1</td><td>Shatter-Lock</td><td>Opens locks loudly.</td></tr>
+            <tr><th>Lvl</th><th>Spell</th><th>Mechanic & Utility</th></tr>
+            <tr><td>0</td><td>Spark</td><td>Ignites flammable objects instantly without tinderbox.</td></tr>
+            <tr><td>0</td><td>Murmur</td><td>Projects disembodied whisper 30ft to distract.</td></tr>
+            <tr><td>0</td><td>Chilling Touch</td><td>Cools objects/meat by 20 degrees.</td></tr>
+            <tr><td>0</td><td>Gilding Dust</td><td>Glowing dust tracking powder (lasts 10 mins).</td></tr>
+            <tr><td>1</td><td>Apprentice Sleep</td><td>Forces 10 HP worth of low-tier mobs to sleep.</td></tr>
+            <tr><td>1</td><td>Void Slick</td><td>10x10 frictionless grease. DEX or prone (-2 DR).</td></tr>
+            <tr><td>1</td><td>Aether Dart</td><td>Auto-hits for 4 physical dmg. Pierces standard DR.</td></tr>
+            <tr><td>1</td><td>Shatter-Lock</td><td>Blows open locked doors. Causes massive noise.</td></tr>
+            <tr><td>1</td><td>Flicker</td><td>Reaction: Teleports 10ft from attack. Forces Strain check.</td></tr>
+            <tr><td>2</td><td>Grave Web</td><td>20x20 sticky web. STR check or pinned (-2 DR).</td></tr>
+            <tr><td>2</td><td>Shadow Blur</td><td>All incoming physical/missile attacks suffer -30% acc.</td></tr>
+            <tr><td>3</td><td>Abyssal Deton.</td><td>20ft radius explosion for 20 dmg. Triggers cave-in.</td></tr>
+            <tr><td>3</td><td>Aetheric Haste</td><td>+20% DEX def, double speed, 2 attacks/round.</td></tr>
         </table>`;
     }
     else if (cat === 'divine') {
         html = `
         <table class="store-table">
-            <tr><th>Lvl</th><th>Prayer</th><th>Effect</th></tr>
-            <tr><td>0</td><td>Seal of Seven</td><td>Temporary chalk ward.</td></tr>
-            <tr><td>1</td><td>Purify Food/Water</td><td>Cures Infection.</td></tr>
-            <tr><td>1</td><td>Mend Flesh</td><td>Heals HP = 2 + Tens Digit of Resolve.</td></tr>
+            <tr><th>Lvl</th><th>Prayer</th><th>Mechanic & Utility</th></tr>
+            <tr><td>0</td><td>Seal of Seven</td><td>Temporary chalk ward. Hostiles roll WIS to pass door.</td></tr>
+            <tr><td>0</td><td>Purity Gauge</td><td>Fingertips glow grey if water/food is infected.</td></tr>
+            <tr><td>0</td><td>Vigilant Eye</td><td>+5% to specific trap/wire spotting for 1 min.</td></tr>
+            <tr><td>0</td><td>Muted Step</td><td>Dampens armor clanking for 3 turns.</td></tr>
+            <tr><td>1</td><td>Purify Food/Water</td><td>Purges rot. Only spell capable of curing Filth-Blade Infection.</td></tr>
+            <tr><td>1</td><td>Star's Radiance</td><td>Heatless 30ft light. Negates Blinding Dark ambushes.</td></tr>
+            <tr><td>1</td><td>Mend Flesh</td><td>Heals HP = 2 + (Tens Digit of Resolve). Caster immobilized.</td></tr>
+            <tr><td>1</td><td>Sanctuary Ward</td><td>Hostiles must pass WIS check to attack caster.</td></tr>
+            <tr><td>1</td><td>Turn the Void</td><td>Blasts 10 HP of undead/cultists. Forces flee.</td></tr>
+            <tr><td>2</td><td>Paralyze Heretic</td><td>Freezes 2 targets. Melee hits against them Auto-Max Dmg.</td></tr>
+            <tr><td>2</td><td>Vow of Silence</td><td>15ft dead air sphere. Negates alarm strings/casting.</td></tr>
+            <tr><td>2</td><td>Cleanse Pathology</td><td>Instantly cures Infection and Cognitive Strain migraines.</td></tr>
+            <tr><td>3</td><td>Choir of Stars</td><td>Allies +10% Hit / +1 DR. Hostiles -10% Hit.</td></tr>
+            <tr><td>3</td><td>Resuscitate</td><td>Drags dead ally to 1 HP. Ally loses 10% CON permanently.</td></tr>
         </table>`;
     }
     container.innerHTML = html;
@@ -375,5 +421,5 @@ function showRefCategory() {
 
 window.addEventListener('DOMContentLoaded', () => {
     switchCharacterSlot();
-    showRefCategory();
+    showRefCategory(); 
 });
