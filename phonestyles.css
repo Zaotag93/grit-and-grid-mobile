@@ -111,3 +111,42 @@ h3.section-header { color: #F26522; border-bottom: 1px solid #F26522; font-famil
 .horizontal-checks { display: flex; flex-direction: row; align-items: center; gap: 3px; white-space: nowrap; }
 .skill-calc { font-family: monospace; font-size: 11px; color: #aaa; }
 .skill-total { font-weight: bold; color: #F26522; font-size: 12px; }
+/* Floating Action Button for Dice */
+.fab-dice {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #F26522;
+    color: #000;
+    border: 2px solid #fff;
+    border-radius: 30px;
+    padding: 12px 18px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+    z-index: 999;
+}
+
+/* Dice Modal Popup Overlay */
+.dice-modal {
+    display: none;
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.dice-modal-content {
+    background: #1e1e1e;
+    border: 2px solid #F26522;
+    padding: 20px;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+}
