@@ -44,7 +44,7 @@
         </div>
     </div>
 
-    <!-- MOBILE APP 4-TAB NAVIGATION BAR -->
+    <!-- MOBILE 4-TAB NAVIGATION BAR -->
     <div class="mobile-tabs">
         <button type="button" class="tab-btn active" id="tab_btn_sheet" onclick="switchTab('sheet')">Sheet</button>
         <button type="button" class="tab-btn" id="tab_btn_inv" onclick="switchTab('inv')">Inventory</button>
@@ -54,6 +54,7 @@
 
     <!-- MAIN APP CONTAINER -->
     <div class="app-container">
+        
         <!-- TAB 1: SHEET -->
         <div id="tab_sheet" class="app-tab active-tab">
             <div class="sheet-section">
@@ -103,28 +104,28 @@
                 <h3 class="section-header">Vocational Skills (Base + Bonus = Total)</h3>
                 <table class="dossier-table">
                     <tr><th>Vanguard Suite</th><th>Base + Bonus = Total</th></tr>
-                    <tr><td>Close-Quarter Combat [STR]</td><td class="skill-calc">[<span id="b_cqc">30</span>]+[<input id="bon_cqc" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_cqc">30</span>%</td></tr>
-                    <tr><td>Shield Deflection [DEX]</td><td class="skill-calc">[<span id="b_shi">30</span>]+[<input id="bon_shi" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_shi">30</span>%</td></tr>
-                    <tr><td>Heavy Armor Tolerance [CON]</td><td class="skill-calc">[<span id="b_arm">30</span>]+[<input id="bon_arm" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_arm">30</span>%</td></tr>
-                    <tr><td>Ranged Precision [DEX]</td><td class="skill-calc">[<span id="b_ran">30</span>]+[<input id="bon_ran" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_ran">30</span>%</td></tr>
+                    <tr><td>Close-Quarter Combat [STR]</td><td class="skill-calc">[<span id="b_cqc">30</span>]+[<input id="bon_cqc" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_cqc">30</span>%</td></tr>
+                    <tr><td>Shield Deflection [DEX]</td><td class="skill-calc">[<span id="b_shi">30</span>]+[<input id="bon_shi" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_shi">30</span>%</td></tr>
+                    <tr><td>Heavy Armor Tolerance [CON]</td><td class="skill-calc">[<span id="b_arm">30</span>]+[<input id="bon_arm" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_arm">30</span>%</td></tr>
+                    <tr><td>Ranged Precision [DEX]</td><td class="skill-calc">[<span id="b_ran">30</span>]+[<input id="bon_ran" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_ran">30</span>%</td></tr>
                     
                     <tr><th>Infiltration Suite</th><th>Base + Bonus = Total</th></tr>
-                    <tr><td>Trap & Hazard Sensing [WIS]</td><td class="skill-calc">[<span id="b_tra">30</span>]+[<input id="bon_tra" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_tra">30</span>%</td></tr>
-                    <tr><td>Lock & Mech. Handling [DEX]</td><td class="skill-calc">[<span id="b_loc">30</span>]+[<input id="bon_loc" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_loc">30</span>%</td></tr>
-                    <tr><td>Sneak & Infiltrate [DEX]</td><td class="skill-calc">[<span id="b_sne">30</span>]+[<input id="bon_sne" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_sne">30</span>%</td></tr>
-                    <tr><td>Wilderness Tracking [WIS]</td><td class="skill-calc">[<span id="b_trk">30</span>]+[<input id="bon_trk" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_trk">30</span>%</td></tr>
+                    <tr><td>Trap & Hazard Sensing [WIS]</td><td class="skill-calc">[<span id="b_tra">30</span>]+[<input id="bon_tra" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_tra">30</span>%</td></tr>
+                    <tr><td>Lock & Mech. Handling [DEX]</td><td class="skill-calc">[<span id="b_loc">30</span>]+[<input id="bon_loc" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_loc">30</span>%</td></tr>
+                    <tr><td>Sneak & Infiltrate [DEX]</td><td class="skill-calc">[<span id="b_sne">30</span>]+[<input id="bon_sne" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_sne">30</span>%</td></tr>
+                    <tr><td>Wilderness Tracking [WIS]</td><td class="skill-calc">[<span id="b_trk">30</span>]+[<input id="bon_trk" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_trk">30</span>%</td></tr>
 
                     <tr><th>Sanctified Suite</th><th>Base + Bonus = Total</th></tr>
-                    <tr><td>Faith & Clerical Arms [STR]</td><td class="skill-calc">[<span id="b_fai">30</span>]+[<input id="bon_fai" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_fai">30</span>%</td></tr>
-                    <tr><td>Alchemical Medicine [INT]</td><td class="skill-calc">[<span id="b_med">30</span>]+[<input id="bon_med" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_med">30</span>%</td></tr>
-                    <tr><td>Congregational Resolve [WIS]</td><td class="skill-calc">[<span id="b_res">30</span>]+[<input id="bon_res" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_res">30</span>%</td></tr>
-                    <tr><td>Void Pathology [INT]</td><td class="skill-calc">[<span id="b_voi">30</span>]+[<input id="bon_voi" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_voi">30</span>%</td></tr>
+                    <tr><td>Faith & Clerical Arms [STR]</td><td class="skill-calc">[<span id="b_fai">30</span>]+[<input id="bon_fai" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_fai">30</span>%</td></tr>
+                    <tr><td>Alchemical Medicine [INT]</td><td class="skill-calc">[<span id="b_med">30</span>]+[<input id="bon_med" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_med">30</span>%</td></tr>
+                    <tr><td>Congregational Resolve [WIS]</td><td class="skill-calc">[<span id="b_res">30</span>]+[<input id="bon_res" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_res">30</span>%</td></tr>
+                    <tr><td>Void Pathology [INT]</td><td class="skill-calc">[<span id="b_voi">30</span>]+[<input id="bon_voi" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_voi">30</span>%</td></tr>
 
                     <tr><th>Arcane Suite</th><th>Base + Bonus = Total</th></tr>
-                    <tr><td>Arcane Channeling [WIS]</td><td class="skill-calc">[<span id="b_arc">30</span>]+[<input id="bon_arc" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_arc">30</span>%</td></tr>
-                    <tr><td>Scroll Transcription [INT]</td><td class="skill-calc">[<span id="b_scr">30</span>]+[<input id="bon_scr" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_scr">30</span>%</td></tr>
-                    <tr><td>Staff Deflection [DEX]</td><td class="skill-calc">[<span id="b_stf">30</span>]+[<input id="bon_stf" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_stf">30</span>%</td></tr>
-                    <tr><td>Artifact Appraisal [INT]</td><td class="skill-calc">[<span id="b_app">30</span>]+[<input id="bon_app" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_app">30</span>%</td></tr>
+                    <tr><td>Arcane Channeling [WIS]</td><td class="skill-calc">[<span id="b_arc">30</span>]+[<input id="bon_arc" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_arc">30</span>%</td></tr>
+                    <tr><td>Scroll Transcription [INT]</td><td class="skill-calc">[<span id="b_scr">30</span>]+[<input id="bon_scr" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_scr">30</span>%</td></tr>
+                    <tr><td>Staff Deflection [DEX]</td><td class="skill-calc">[<span id="b_stf">30</span>]+[<input id="bon_stf" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_stf">30</span>%</td></tr>
+                    <tr><td>Artifact Appraisal [INT]</td><td class="skill-calc">[<span id="b_app">30</span>]+[<input id="bon_app" type="number" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_app">30</span>%</td></tr>
                 </table>
             </div>
         </div>
@@ -170,7 +171,7 @@
         </div>
     </div>
 
-    <!-- FLOATING DICE ACTION BUTTON (MOBILE) -->
+    <!-- FLOATING DICE ACTION BUTTON -->
     <button type="button" class="fab-dice" onclick="toggleDiceModal()">🎲 Roll</button>
 
     <!-- DICE MODAL POPUP -->
