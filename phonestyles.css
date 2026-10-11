@@ -22,6 +22,12 @@ input, textarea {
     padding: 4px;
 }
 
+/* Widen the skill bonus input boxes specifically */
+input[id^="bon_"] {
+    width: 45px !important;
+    text-align: center;
+}
+
 input[type="checkbox"] {
     width: auto !important;
     cursor: pointer;
@@ -51,7 +57,7 @@ button {
 .action-btn { background: #222; color: #fff; border: 1px solid #F26522; padding: 6px 10px; font-weight: bold; font-size: 12px; flex: 1; }
 .action-btn:hover { background: #F26522; color: #000; }
 
-/* Mobile App Tab Navigation */
+/* Mobile App 4-Tab Navigation */
 .mobile-tabs {
     display: flex;
     background: #111;
@@ -63,9 +69,9 @@ button {
     background: #1a1a1a;
     color: #bbb;
     border: none;
-    padding: 12px 5px;
+    padding: 12px 2px;
     font-weight: bold;
-    font-size: 13px;
+    font-size: 12px;
     cursor: pointer;
     text-align: center;
     border-right: 1px solid #444;
