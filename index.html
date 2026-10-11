@@ -54,10 +54,7 @@
 
     <!-- MAIN APP CONTAINER -->
     <div class="app-container">
-        
-        <!-- ========================================== -->
-        <!-- TAB 1: CHARACTER SHEET                     -->
-        <!-- ========================================== -->
+        <!-- TAB 1: SHEET -->
         <div id="tab_sheet" class="app-tab active-tab">
             <div class="sheet-section">
                 <h2 class="dossier-title">Contractor Dossier</h2>
@@ -95,7 +92,6 @@
                     <label>/</label> <input id="char_maxHp" type="number" style="width:35px;" value="8">
                 </div>
 
-                <!-- Core Capabilities -->
                 <h3 class="section-header">Core Capabilities (Roll-Under d100)</h3>
                 <table class="dossier-table">
                     <tr><th>Stat</th><th>%</th><th>Stat</th><th>%</th></tr>
@@ -104,7 +100,6 @@
                     <tr><td>WIS</td><td>[ <input id="stat_wis" type="number" style="width:35px;" value="30" oninput="calcSkills()"> ]%</td><td>CHA</td><td>[ <input id="stat_cha" type="number" style="width:35px;" value="30" oninput="calcSkills()"> ]%</td></tr>
                 </table>
 
-                <!-- Vocational Skills -->
                 <h3 class="section-header">Vocational Skills (Base + Bonus = Total)</h3>
                 <table class="dossier-table">
                     <tr><th>Vanguard Suite</th><th>Base + Bonus = Total</th></tr>
@@ -131,96 +126,16 @@
                     <tr><td>Staff Deflection [DEX]</td><td class="skill-calc">[<span id="b_stf">30</span>]+[<input id="bon_stf" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_stf">30</span>%</td></tr>
                     <tr><td>Artifact Appraisal [INT]</td><td class="skill-calc">[<span id="b_app">30</span>]+[<input id="bon_app" type="number" style="width:35px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_app">30</span>%</td></tr>
                 </table>
-
-                <!-- Combat & Attrition Log -->
-                <h3 class="section-header">Combat & Attrition Log</h3>
-                <div class="attrition-log">
-                    • <b>Attack:</b> Roll under skill. Damage: Units Digit.<br>
-                    • <b>Wear Tax:</b> Units digit 2, 3, or 4 = Weapon Notch (-1 Dmg).
-                </div>
-                <table class="dossier-table">
-                    <tr><th>Weapon / Attack</th><th>Dmg</th><th>Notches (-1 each)</th></tr>
-                    <tr><td>1. <input id="wp1_n" style="width:90%;"></td><td>[<input id="wp1_d" style="width:25px;">]</td><td><div class="horizontal-checks">[<input type="checkbox" id="wp1_c1">][<input type="checkbox" id="wp1_c2">][<input type="checkbox" id="wp1_c3">]</div></td></tr>
-                    <tr><td>2. <input id="wp2_n" style="width:90%;"></td><td>[<input id="wp2_d" style="width:25px;">]</td><td><div class="horizontal-checks">[<input type="checkbox" id="wp2_c1">][<input type="checkbox" id="wp2_c2">][<input type="checkbox" id="wp2_c3">]</div></td></tr>
-                    <tr><td>3. <input id="wp3_n" style="width:90%;"></td><td>[<input id="wp3_d" style="width:25px;">]</td><td><div class="horizontal-checks">[<input type="checkbox" id="wp3_c1">][<input type="checkbox" id="wp3_c2">][<input type="checkbox" id="wp3_c3">]</div></td></tr>
-                </table>
-
-                <!-- Armor & Pathology -->
-                <table class="dossier-table" style="margin-top: 10px;">
-                    <tr><th>Armor Suite</th><th>DR</th><th>Sundered</th></tr>
-                    <tr><td>Armor: <input id="arm_n" style="width:70%;"></td><td>[<input id="arm_d" style="width:25px;">]</td><td><div class="horizontal-checks">[<input type="checkbox" id="arm_c1">][<input type="checkbox" id="arm_c2">][<input type="checkbox" id="arm_c3">]</div></td></tr>
-                    <tr><td>Shield: <input id="shd_n" style="width:70%;"></td><td>[<input id="shd_d" style="width:25px;">]</td><td><div class="horizontal-checks">[<input type="checkbox" id="shd_c1">][<input type="checkbox" id="shd_c2">][<input type="checkbox" id="shd_c3">]</div></td></tr>
-                </table>
-                <div style="font-weight: bold; margin-bottom: 10px;">Total Current DR: [ <input id="total_dr" type="number" style="width:40px;"> ]</div>
-
-                <h3 class="section-header">Pathology & Strain</h3>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                    <input type="checkbox" id="path_inf"> <label for="path_inf" class="chk-label"><b style="color:#F26522;">INFECTION:</b> No healing, lose 1 HP daily.</label>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                    <input type="checkbox" id="path_cog"> <label for="path_cog" class="chk-label"><b style="color:#F26522;">COGNITIVE STRAIN:</b> -20% checks, -2 DR.</label>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                    <input type="checkbox" id="path_bli"> <label for="path_bli" class="chk-label"><b style="color:#F26522;">BLINDED:</b> -20% physical checks.</label>
-                </div>
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- TAB 2: INVENTORY & EQUIPMENT               -->
-        <!-- ========================================== -->
+        <!-- TAB 2: INVENTORY -->
         <div id="tab_inv" class="app-tab">
             <div class="sheet-section">
                 <h2 class="dossier-title">Logistics & Inventory</h2>
                 <div class="sheet-row">
-                    <label>Corporate Wealth (gp):</label> <input id="inv_gold" type="number" style="width:80px;" value="20">
+                    <label>Wealth (gp):</label> <input id="inv_gold" type="number" style="width:80px;" value="20">
                 </div>
-
-                <div class="backpack-panel">
-                    <div class="sheet-row">
-                        <label>Backpack Type:</label>
-                        <select id="inv_backpack" onchange="toggleMasterBackpack()">
-                            <option value="Normal">Basic Canvas (12 Slots)</option>
-                            <option value="Master">Master-Grade (120 sp) [Attachments]</option>
-                        </select>
-                    </div>
-                    <div id="masterBackpackAttachments" style="display: none; border-top: 1px dashed #555; padding-top: 8px; margin-top: 8px;">
-                        <div class="sheet-row">
-                            <label style="color:#F26522;">Attach 1:</label>
-                            <select id="inv_attach1" onchange="updateBackpackNotes()">
-                                <option value="None">None</option>
-                                <option value="Exterior Cargo Loops">Exterior Cargo Loops</option>
-                                <option value="Sconce Rig">Sconce Rig</option>
-                                <option value="Iron-Plate Baffle">Iron-Plate Baffle</option>
-                                <option value="Oiled-Hide Water-Seal">Oiled-Hide Water-Seal</option>
-                                <option value="Quiver-Latch">Quiver-Latch</option>
-                                <option value="Apothecary Tray">Apothecary Tray</option>
-                                <option value="Bedroll & Camp Sling">Bedroll Sling</option>
-                                <option value="Drop-Away Release">Drop-Away Release</option>
-                                <option value="Signal-Bell">Signal-Bell</option>
-                                <option value="Scavenger Hook">Scavenger Hook</option>
-                            </select>
-                        </div>
-                        <div class="sheet-row" style="margin-top:5px;">
-                            <label style="color:#F26522;">Attach 2:</label>
-                            <select id="inv_attach2" onchange="updateBackpackNotes()">
-                                <option value="None">None</option>
-                                <option value="Exterior Cargo Loops">Exterior Cargo Loops</option>
-                                <option value="Sconce Rig">Sconce Rig</option>
-                                <option value="Iron-Plate Baffle">Iron-Plate Baffle</option>
-                                <option value="Oiled-Hide Water-Seal">Oiled-Hide Water-Seal</option>
-                                <option value="Quiver-Latch">Quiver-Latch</option>
-                                <option value="Apothecary Tray">Apothecary Tray</option>
-                                <option value="Bedroll & Camp Sling">Bedroll Sling</option>
-                                <option value="Drop-Away Release">Drop-Away Release</option>
-                                <option value="Signal-Bell">Signal-Bell</option>
-                                <option value="Scavenger Hook">Scavenger Hook</option>
-                            </select>
-                        </div>
-                        <textarea id="backpack_notes" readonly rows="3" style="width:100%; margin-top:5px; font-size:11px; color:#ccc; background:#111; border:1px solid #444;" placeholder="Attachment rules..."></textarea>
-                    </div>
-                </div>
-
                 <table class="dossier-table" style="width: 100%;">
                     <tr><th style="width: 15%;">Slot</th><th>Item Name</th></tr>
                     <script>
@@ -229,82 +144,48 @@
                         }
                     </script>
                 </table>
-
-                <h3 class="section-header">Consumables</h3>
-                <div class="sheet-row"><label style="width:130px;">Torches (1hr):</label><input id="cons_torches" type="number" style="width:60px;"></div>
-                <div class="sheet-row"><label style="width:130px;">Iron Rations:</label><input id="cons_rations" type="number" style="width:60px;"></div>
-                <div class="sheet-row"><label style="width:130px;">Antidotes:</label><input id="cons_anti" type="number" style="width:60px;"></div>
-                <div class="sheet-row"><label style="width:130px;">Ammunition:</label><input id="cons_ammo" type="number" style="width:60px;"></div>
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- TAB 3: MAGIC                               -->
-        <!-- ========================================== -->
+        <!-- TAB 3: MAGIC -->
         <div id="tab_magic" class="app-tab">
             <div class="sheet-section">
                 <h3 class="section-header" style="margin-top:0;">Grimoire & Sacred Manifest</h3>
-                <div class="sheet-row">
-                    <label>Daily Slots:</label> <input id="spl_max" type="number" style="width:40px;">
-                    <label>Available:</label> 
-                    <div class="horizontal-checks">
-                        [<input type="checkbox" id="sp_s1">][<input type="checkbox" id="sp_s2">][<input type="checkbox" id="sp_s3">][<input type="checkbox" id="sp_s4">]
-                    </div>
-                </div>
-                
-                <b style="color:#ccc; font-size:13px;">Cantrips & Minor Rites (8 Slots):</b>
-                <table class="dossier-table">
-                    <tr><th>#</th><th>Spell Name</th><th>Format</th></tr>
-                    <script>
-                        for(let i=1; i<=8; i++) {
-                            document.write(`<tr><td>${i}.</td><td><input id="can${i}_n" style="width:90%;"></td><td><input id="can${i}_f" style="width:90%;"></td></tr>`);
-                        }
-                    </script>
-                </table>
-
-                <div class="sheet-row" style="margin-top:10px;">
-                    <label style="color:#F26522;">Master Spell Library:</label>
-                    <select id="grimoire_type" onchange="toggleGrimoireSize()" style="flex:1;">
-                        <option value="10">Folio (10 Pages)</option>
-                        <option value="30">Grimoire (30 Pages)</option>
-                    </select>
-                </div>
-                <table class="dossier-table" id="masterSpellTable">
-                    <tr><th>Slot</th><th>Lvl</th><th>Spell Name</th><th>Pg</th></tr>
-                    <script>
-                        for(let i=1; i<=30; i++) {
-                            document.write(`<tr id="grim_row_${i}"><td>${i}.</td><td><input id="lib${i}_l" style="width:70%;"></td><td><input id="lib${i}_n" style="width:90%;"></td><td><input id="lib${i}_p" style="width:70%;"></td></tr>`);
-                        }
-                    </script>
-                </table>
             </div>
         </div>
 
-        <!-- ========================================== -->
-        <!-- TAB 4: REFERENCE & RULES DATABASE          -->
-        <!-- ========================================== -->
+        <!-- TAB 4: REFERENCE -->
         <div id="tab_ref" class="app-tab">
             <div class="sheet-section">
                 <h2 class="dossier-title">Rules & Equipment Database</h2>
-                <div class="sheet-row" style="background: #111; padding: 8px; border: 1px solid #555; margin-bottom: 15px;">
-                    <select id="ref_categorySelect" onchange="showRefCategory()" style="font-weight:bold;">
-                        <option value="glossary">Glossary & Quick Rules</option>
-                        <option value="melee">Melee Armory</option>
-                        <option value="ranged">Ranged Armory & Ammo</option>
-                        <option value="armor">Armor & Deflection</option>
-                        <option value="shields">Shields & Wards</option>
-                        <option value="logistics">Expedient Logistics</option>
-                        <option value="backpack">Backpack Attachments</option>
-                        <option value="arcane">Arcane Grimoire (Spells)</option>
-                        <option value="divine">Sanctified Manifest (Prayers)</option>
-                    </select>
-                </div>
-                <div id="store_container" style="overflow-x: auto;">
-                    <!-- Injected by JavaScript -->
-                </div>
+                <select id="ref_categorySelect" onchange="showRefCategory()" style="font-weight:bold; margin-bottom: 10px;">
+                    <option value="glossary">Glossary & Quick Rules</option>
+                    <option value="melee">Melee Armory</option>
+                    <option value="ranged">Ranged Armory</option>
+                    <option value="armor">Armor</option>
+                    <option value="shields">Shields</option>
+                </select>
+                <div id="store_container" style="overflow-x: auto;"></div>
             </div>
         </div>
+    </div>
 
+    <!-- FLOATING DICE ACTION BUTTON (MOBILE) -->
+    <button type="button" class="fab-dice" onclick="toggleDiceModal()">🎲 Roll</button>
+
+    <!-- DICE MODAL POPUP -->
+    <div id="diceModal" class="dice-modal">
+        <div class="dice-modal-content">
+            <h3 style="color:#F26522; margin-top:0;">Grit & Grid Dice Roller</h3>
+            <div style="margin-bottom: 15px;">
+                <button type="button" class="action-btn" onclick="mobileRoll('d100')" style="padding:10px 15px; font-size:14px;">Roll d100</button>
+                <button type="button" class="action-btn" onclick="mobileRoll('d10')" style="padding:10px 15px; font-size:14px; margin-left:10px;">Roll d10</button>
+            </div>
+            <div id="mobile_dice_output" style="font-family:monospace; font-size:15px; color:#fff; background:#111; padding:10px; border:1px solid #444; margin-bottom:15px;">
+                Tap a die to roll...
+            </div>
+            <button type="button" class="action-btn" onclick="toggleDiceModal()" style="background:#444;">Close</button>
+        </div>
     </div>
 
     <script src="JAVA phone scripts.js"></script>
