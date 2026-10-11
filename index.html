@@ -44,18 +44,19 @@
         </div>
     </div>
 
-    <!-- MOBILE APP TAB NAVIGATION BAR -->
+    <!-- MOBILE APP 4-TAB NAVIGATION BAR -->
     <div class="mobile-tabs">
-        <button type="button" class="tab-btn active" id="tab_btn_sheet" onclick="switchTab('sheet')">Character Sheet</button>
-        <button type="button" class="tab-btn" id="tab_btn_inv" onclick="switchTab('inv')">Inventory & Gear</button>
-        <button type="button" class="tab-btn" id="tab_btn_magic" onclick="switchTab('magic')">Magic & Rules</button>
+        <button type="button" class="tab-btn active" id="tab_btn_sheet" onclick="switchTab('sheet')">Sheet</button>
+        <button type="button" class="tab-btn" id="tab_btn_inv" onclick="switchTab('inv')">Inventory</button>
+        <button type="button" class="tab-btn" id="tab_btn_magic" onclick="switchTab('magic')">Magic</button>
+        <button type="button" class="tab-btn" id="tab_btn_ref" onclick="switchTab('ref')">Reference</button>
     </div>
 
     <!-- MAIN APP CONTAINER -->
     <div class="app-container">
         
         <!-- ========================================== -->
-        <!-- TAB 1: CHARACTER SHEET (Stats, Skills, HP) -->
+        <!-- TAB 1: CHARACTER SHEET                     -->
         <!-- ========================================== -->
         <div id="tab_sheet" class="app-tab active-tab">
             <div class="sheet-section">
@@ -230,15 +231,15 @@
                 </table>
 
                 <h3 class="section-header">Consumables</h3>
-                <div class="sheet-row"><label style="width:130px;">Torches (1hr):</label><input id="cons_torches" type="number" style="width:40px;"></div>
-                <div class="sheet-row"><label style="width:130px;">Iron Rations:</label><input id="cons_rations" type="number" style="width:40px;"></div>
-                <div class="sheet-row"><label style="width:130px;">Antidotes:</label><input id="cons_anti" type="number" style="width:40px;"></div>
-                <div class="sheet-row"><label style="width:130px;">Ammunition:</label><input id="cons_ammo" type="number" style="width:40px;"></div>
+                <div class="sheet-row"><label style="width:130px;">Torches (1hr):</label><input id="cons_torches" type="number" style="width:60px;"></div>
+                <div class="sheet-row"><label style="width:130px;">Iron Rations:</label><input id="cons_rations" type="number" style="width:60px;"></div>
+                <div class="sheet-row"><label style="width:130px;">Antidotes:</label><input id="cons_anti" type="number" style="width:60px;"></div>
+                <div class="sheet-row"><label style="width:130px;">Ammunition:</label><input id="cons_ammo" type="number" style="width:60px;"></div>
             </div>
         </div>
 
         <!-- ========================================== -->
-        <!-- TAB 3: MAGIC & REFERENCE DATABASE          -->
+        <!-- TAB 3: MAGIC                               -->
         <!-- ========================================== -->
         <div id="tab_magic" class="app-tab">
             <div class="sheet-section">
@@ -276,9 +277,16 @@
                         }
                     </script>
                 </table>
+            </div>
+        </div>
 
-                <h3 class="section-header">Rules & Equipment Reference</h3>
-                <div class="sheet-row">
+        <!-- ========================================== -->
+        <!-- TAB 4: REFERENCE & RULES DATABASE          -->
+        <!-- ========================================== -->
+        <div id="tab_ref" class="app-tab">
+            <div class="sheet-section">
+                <h2 class="dossier-title">Rules & Equipment Database</h2>
+                <div class="sheet-row" style="background: #111; padding: 8px; border: 1px solid #555; margin-bottom: 15px;">
                     <select id="ref_categorySelect" onchange="showRefCategory()" style="font-weight:bold;">
                         <option value="glossary">Glossary & Quick Rules</option>
                         <option value="melee">Melee Armory</option>
@@ -291,7 +299,7 @@
                         <option value="divine">Sanctified Manifest (Prayers)</option>
                     </select>
                 </div>
-                <div id="store_container" style="margin-top: 10px; overflow-x: auto;">
+                <div id="store_container" style="overflow-x: auto;">
                     <!-- Injected by JavaScript -->
                 </div>
             </div>
