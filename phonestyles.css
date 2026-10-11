@@ -1,0 +1,107 @@
+body {
+    background-color: #404040;
+    color: #ffffff;
+    font-family: calibri, sans-serif;
+    margin: 0;
+    padding: 10px;
+}
+
+select {
+    width: 100%;
+    background-color: #191919;
+    color: #ffffff;
+    border: 1px solid #555;
+    padding: 4px;
+}
+
+input, textarea {
+    width: 100%;
+    background-color: #191919;
+    border: 1px solid #555;
+    color: #ffffff;
+    padding: 4px;
+}
+
+input[type="checkbox"] {
+    width: auto !important;
+    cursor: pointer;
+    margin: 0;
+}
+
+button {
+    background-color: #191919;
+    color: #ffffff;
+    border: 1px solid #F26522;
+    cursor: pointer;
+}
+
+/* Roster Bar Header */
+.roster-bar {
+    background: #111;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #F26522;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.nav-group { display: flex; align-items: center; gap: 8px; }
+.nav-group label { color: #F26522; font-weight: bold; font-size: 13px; white-space: nowrap; }
+.action-buttons { display: flex; gap: 5px; flex-wrap: wrap; }
+.action-btn { background: #222; color: #fff; border: 1px solid #F26522; padding: 6px 10px; font-weight: bold; font-size: 12px; flex: 1; }
+.action-btn:hover { background: #F26522; color: #000; }
+
+/* Mobile App Tab Navigation */
+.mobile-tabs {
+    display: flex;
+    background: #111;
+    border: 1px solid #555;
+    margin-bottom: 15px;
+}
+.tab-btn {
+    flex: 1;
+    background: #1a1a1a;
+    color: #bbb;
+    border: none;
+    padding: 12px 5px;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+    border-right: 1px solid #444;
+}
+.tab-btn:last-child { border-right: none; }
+.tab-btn.active {
+    background: #F26522;
+    color: #000;
+}
+
+/* App Tabs Visibility */
+.app-tab { display: none; }
+.app-tab.active-tab { display: block; }
+
+/* Sheet Sections & Headers */
+.sheet-section { background: #1e1e1e; padding: 12px; margin-bottom: 15px; border: 1px solid #444; color: #e0e0e0; }
+.sheet-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; font-size: 13px; }
+.sheet-row label { font-weight: bold; white-space: nowrap; }
+
+h2.dossier-title { color: #F26522; border-bottom: 2px solid #F26522; font-family: Georgia, serif; text-transform: uppercase; margin-top: 0; font-size: 16px; }
+h3.section-header { color: #F26522; border-bottom: 1px solid #F26522; font-family: Georgia, serif; font-variant: small-caps; margin-top: 15px; margin-bottom: 8px; font-size: 14px; }
+
+/* Tables & Grids */
+.dossier-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 12px; }
+.dossier-table th, .dossier-table td { border-bottom: 1px dashed #555; padding: 4px 2px; text-align: left; }
+.dossier-table th { font-weight: bold; color: #ccc; }
+
+.store-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+.store-table th { background: #F26522; color: #fff; padding: 6px; text-align: left; }
+.store-table td { padding: 6px; border-bottom: 1px solid #333; }
+.store-table tr:nth-child(even) { background: #1a1a1a; }
+.store-table tr:nth-child(odd) { background: #222; }
+
+.attrition-log { font-size: 11px; margin-bottom: 8px; line-height: 1.3; color: #bbb; }
+.chk-label { font-weight: normal !important; font-size: 12px; cursor: pointer; }
+.backpack-panel { background: #2a2a2a; padding: 8px; border: 1px solid #555; margin-bottom: 8px; }
+.horizontal-checks { display: flex; flex-direction: row; align-items: center; gap: 3px; white-space: nowrap; }
+.skill-calc { font-family: monospace; font-size: 11px; color: #aaa; }
+.skill-total { font-weight: bold; color: #F26522; font-size: 12px; }
