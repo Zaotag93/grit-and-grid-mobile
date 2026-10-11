@@ -71,6 +71,9 @@ function switchCharacterSlot() {
     if (profSelect && profSelect.value === 'Custom') customBox.style.display = 'block';
     else if (customBox) customBox.style.display = 'none';
 
+    // TRIGGER DROPDOWNS ON LOAD
+    toggleMasterBackpack();
+    toggleGrimoireSize();
     calcSkills();
 }
 
@@ -200,7 +203,52 @@ function calcSkills() {
     });
 }
 
-// THE MOBILE DICE ROLLER WIDGET LOGIC
+// ==========================================
+// BACKPACK & GRIMOIRE LOGIC (RESTORED)
+// ==========================================
+function updateBackpackNotes() {
+    const a1 = document.getElementById('inv_attach1').value;
+    const a2 = document.getElementById('inv_attach2').value;
+    const notesBox = document.getElementById('backpack_notes');
+    const bpDict = {
+        "Exterior Cargo Loops": "Adds 4 exterior lash-points. Cannot be accessed in combat.",
+        "Sconce Rig": "Hands-free 360 light. Ruins stealth checks entirely.",
+        "Iron-Plate Baffle": "Absorbs rear hits, reducing Wear Tax damage to internals by 1 slot.",
+        "Oiled-Hide Water-Seal": "Protects against slime/rot. If punctured, traps moisture.",
+        "Quiver-Latch": "Carry heavy secondary without holding it. Drawing takes extra action.",
+        "Apothecary Tray": "Prevents vials shattering. Takes 2 internal slots permanently.",
+        "Bedroll & Camp Sling": "Shifts center of gravity downward. Makes pack taller/wider.",
+        "Drop-Away Release": "Instantly drop backpack in emergencies. Your gear is left behind.",
+        "Signal-Bell": "String wire around camp. Constant minor penalty to stealth.",
+        "Scavenger Hook": "Keeps harvest clean. Retains organic musk, attracts predators."
+    };
+    let result = "";
+    if (a1 !== "None" && bpDict[a1]) result += "1. " + bpDict[a1] + "\n";
+    if (a2 !== "None" && bpDict[a2]) result += "2. " + bpDict[a2] + "\n";
+    if (notesBox) notesBox.value = result.trim();
+}
+
+function toggleMasterBackpack() {
+    const bp = document.getElementById('inv_backpack');
+    const menu = document.getElementById('masterBackpackAttachments');
+    if (bp && menu) {
+        menu.style.display = (bp.value === 'Master') ? 'block' : 'none';
+        if (bp.value === 'Master') updateBackpackNotes();
+    }
+}
+
+function toggleGrimoireSize() {
+    const type = document.getElementById('grimoire_type');
+    if (!type) return;
+    for (let i = 11; i <= 30; i++) {
+        const row = document.getElementById('grim_row_' + i);
+        if (row) row.style.display = (type.value === '30') ? 'table-row' : 'none';
+    }
+}
+
+// ==========================================
+// DICE ROLLER & REFERENCE DATABASE
+// ==========================================
 function toggleDiceModal() {
     const modal = document.getElementById('diceModal');
     if (modal) modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
@@ -217,7 +265,6 @@ function mobileRoll(type) {
     }
 }
 
-// THE FULLY RESTORED EQUIPMENT AND RULES DICTIONARY
 function showRefCategory() {
     const cat = document.getElementById('ref_categorySelect');
     if (!cat) return;
