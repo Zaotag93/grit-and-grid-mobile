@@ -27,7 +27,8 @@ function saveCharacterSlot() {
     const inputs = document.querySelectorAll(query);
 
     inputs.forEach(el => {
-        if (el.id && !['charSlotSelect', 'ref_categorySelect', 'backpack_notes', 'grimoire_type'].includes(el.id)) {
+        // FIXED: grimoire_type is no longer excluded, so the 30-page spellbook saves properly!
+        if (el.id && !['charSlotSelect', 'ref_categorySelect', 'backpack_notes'].includes(el.id)) {
             if (el.type === 'checkbox') charData[el.id] = el.checked;
             else charData[el.id] = el.value;
         }
@@ -71,7 +72,6 @@ function switchCharacterSlot() {
     if (profSelect && profSelect.value === 'Custom') customBox.style.display = 'block';
     else if (customBox) customBox.style.display = 'none';
 
-    // TRIGGER DROPDOWNS ON LOAD
     toggleMasterBackpack();
     toggleGrimoireSize();
     calcSkills();
@@ -204,7 +204,7 @@ function calcSkills() {
 }
 
 // ==========================================
-// BACKPACK & GRIMOIRE LOGIC (RESTORED)
+// RESTORED BACKPACK & GRIMOIRE LOGIC
 // ==========================================
 function updateBackpackNotes() {
     const a1 = document.getElementById('inv_attach1').value;
