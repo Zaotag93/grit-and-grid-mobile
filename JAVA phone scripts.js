@@ -27,7 +27,6 @@ function saveCharacterSlot() {
     const inputs = document.querySelectorAll(query);
 
     inputs.forEach(el => {
-        // FIXED: grimoire_type is no longer excluded, so the 30-page spellbook saves properly!
         if (el.id && !['charSlotSelect', 'ref_categorySelect', 'backpack_notes'].includes(el.id)) {
             if (el.type === 'checkbox') charData[el.id] = el.checked;
             else charData[el.id] = el.value;
@@ -150,7 +149,12 @@ function autoFillProfession() {
         "Acolyte Expulsee": { bonuses: { res: 20, med: 20, fai: 10 }, tool: "Carved Symbol of the Stars" },
         "Borderland Deserter": { bonuses: { sne: 20, shi: 20, tra: 10 }, tool: "Hemp Rope (50 ft)" },
         "Grave Robber": { bonuses: { loc: 20, sne: 20, cqc: 10 }, tool: "Iron Grappling Hook" },
-        "Disgraced Scribe": { bonuses: { scr: 20, arc: 20, med: 10 }, tool: "3 Empty Glass Vials" }
+        "Disgraced Scribe": { bonuses: { scr: 20, arc: 20, med: 10 }, tool: "3 Empty Glass Vials" },
+        "Forgeworker": { bonuses: { arm: 20, shi: 20, cqc: 10 }, tool: "Mace/Warhammer" },
+        "Beast Culler": { bonuses: { cqc: 20, trk: 20, sne: 10 }, tool: "Scavenged Iron Cleaver" },
+        "Route Runner": { bonuses: { trk: 20, tra: 20, ran: 10 }, tool: "Bag of Caltrops (20)" },
+        "Flesh-Stitcher": { bonuses: { med: 20, res: 20, voi: 10 }, tool: "Suture Needle & Thread" },
+        "Quartermaster": { bonuses: { app: 20, loc: 20, scr: 10 }, tool: "Traveling Folio" }
     };
 
     if (lastProfession && lastProfession !== "Custom" && dict[lastProfession]) {
