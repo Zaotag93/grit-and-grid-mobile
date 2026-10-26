@@ -1,24 +1,7 @@
-/*
- * Grit & Grid: Clerk's Register (Phone)
- * Original mobile styling, expanded for readability.
- * Restored sheet visibility + PDF-aligned additions.
- */
-
-/* Global Theme and Inputs */
-
-:root {
-    color-scheme: dark;
-    --orange: #F26522;
-}
-
-* {
-    box-sizing: border-box;
-}
-
 body {
     background-color: #404040;
     color: #ffffff;
-    font-family: Calibri, sans-serif;
+    font-family: calibri, sans-serif;
     margin: 0;
     padding: 10px;
 }
@@ -29,7 +12,6 @@ select {
     color: #ffffff;
     border: 1px solid #555;
     padding: 4px;
-    min-width: 0;
 }
 
 input, textarea {
@@ -38,11 +20,9 @@ input, textarea {
     border: 1px solid #555;
     color: #ffffff;
     padding: 4px;
-    min-width: 0;
 }
 
 /* Widen the skill bonus input boxes */
-
 input[id^="bon_"] {
     width: 60px !important;
     text-align: center;
@@ -54,10 +34,6 @@ input[type="checkbox"] {
     margin: 0;
 }
 
-input[readonly] {
-    background-color: #282828;
-}
-
 button {
     background-color: #191919;
     color: #ffffff;
@@ -65,13 +41,7 @@ button {
     cursor: pointer;
 }
 
-button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible {
-    outline: 2px solid #ff9c60;
-    outline-offset: 2px;
-}
-
 /* Roster Bar Header */
-
 .roster-bar {
     background: #111;
     padding: 10px;
@@ -117,7 +87,6 @@ button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-
 }
 
 /* Mobile App 4-Tab Navigation */
-
 .mobile-tabs {
     display: flex;
     background: #111;
@@ -147,36 +116,22 @@ button:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-
     color: #000;
 }
 
-/* App Tabs Visibility
-   Fail-safe: All sheet sections are visible if JavaScript does not load.
-   We hide inactive tabs ONLY after the script fully initializes. */
-
+/* App Tabs Visibility */
 .app-tab {
     display: none;
 }
 
-/* If the script fails to load, show the Sheet tab and an explicit warning. */
-body:not(.js-ready) #tab_sheet {
-    display: block;
-}
-
-.js-ready .app-tab {
-    display: none;
-}
-
-.js-ready .app-tab.active-tab {
+.app-tab.active-tab {
     display: block;
 }
 
 /* Sheet Sections & Headers */
-
 .sheet-section {
     background: #1e1e1e;
     padding: 12px;
     margin-bottom: 15px;
     border: 1px solid #444;
     color: #e0e0e0;
-    min-width: 0;
 }
 
 .sheet-row {
@@ -185,16 +140,11 @@ body:not(.js-ready) #tab_sheet {
     margin-bottom: 8px;
     align-items: center;
     font-size: 13px;
-    flex-wrap: wrap;
 }
 
 .sheet-row label {
     font-weight: bold;
-}
-
-.sheet-row > select, .sheet-row > textarea {
-    flex: 1 1 120px;
-    max-width: 100%;
+    white-space: nowrap;
 }
 
 h2.dossier-title {
@@ -217,7 +167,6 @@ h3.section-header {
 }
 
 /* Tables & Grids */
-
 .dossier-table {
     width: 100%;
     border-collapse: collapse;
@@ -229,7 +178,6 @@ h3.section-header {
     border-bottom: 1px dashed #555;
     padding: 4px 2px;
     text-align: left;
-    vertical-align: middle;
 }
 
 .dossier-table th {
@@ -263,8 +211,6 @@ h3.section-header {
 .store-table tr:nth-child(odd) {
     background: #222;
 }
-
-/* Character Sheet Helpers */
 
 .attrition-log {
     font-size: 11px;
@@ -306,72 +252,7 @@ h3.section-header {
     font-size: 12px;
 }
 
-/* PDF-aligned mechanical notes and expanded training fields */
-
-.rule-note {
-    font-size: 12px;
-    color: #ccc;
-    margin: 6px 0 12px;
-    line-height: 1.5;
-}
-
-.rule-warning {
-    font-size: 12px;
-    color: #ffb196;
-    font-weight: bold;
-}
-
-.skill-summary {
-    color: #ccc;
-    font-size: 12px;
-    line-height: 1.5;
-}
-
-.skill-prof {
-    color: #cfcfcf;
-}
-
-input.promotion-points {
-    width: 44px !important;
-    text-align: center;
-}
-
-.water-checks {
-    flex-wrap: wrap;
-    white-space: normal;
-    gap: 12px;
-    margin: 8px 0;
-}
-
-.water-checks label {
-    display: inline-flex;
-    gap: 4px;
-    align-items: center;
-    cursor: pointer;
-}
-
-.table-scroller {
-    overflow-x: auto;
-    max-width: 100%;
-}
-
-/* On phones the wide, detailed skill tables must remain scrollable,
-   never clipped or silently removed. */
-
-#tab_sheet .dossier-table,
-#tab_magic .dossier-table {
-    display: block;
-    overflow-x: auto;
-    max-width: 100%;
-}
-
-#tab_sheet .dossier-table input,
-#tab_magic .dossier-table input {
-    max-width: none;
-}
-
 /* Floating Action Button for Dice */
-
 .fab-dice {
     position: fixed;
     bottom: 20px;
@@ -389,7 +270,6 @@ input.promotion-points {
 }
 
 /* Dice Modal Popup Overlay */
-
 .dice-modal {
     display: none;
     position: fixed;
@@ -410,40 +290,4 @@ input.promotion-points {
     width: 80%;
     max-width: 300px;
     text-align: center;
-}
-
-/* Keep every section usable at narrow phone sizes */
-
-@media (max-width: 480px) {
-    .sheet-section {
-        padding: 10px;
-    }
-
-    .tab-btn {
-        font-size: 11px;
-        padding: 12px 2px;
-    }
-
-    .fab-dice {
-        right: 12px;
-        bottom: 12px;
-    }
-
-    .horizontal-checks {
-        flex-wrap: wrap;
-        white-space: normal;
-    }
-}
-
-/* Numeric Field Legibility (Prevent Spinners from Obscuring Values) */
-
-input[type="number"] {
-    appearance: textfield;
-    -moz-appearance: textfield;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
 }
