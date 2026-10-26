@@ -1,9 +1,3 @@
-'use strict';
-
-/* Grit & Grid: The Contractor's Manual, uploaded PDF (96 pages),
- * Chapters 1-4 and Appendix A. This is a REFERENCE, not a shop checkout.
- * Monetary units are cp/sp/gp; inventory Slots are not individual item rows.
- */
 window.GG_REFERENCE = {
   glossary: {headers:['Rule / Term','PDF Rule','Page'], rows:[
     ['Starting capabilities','Method A: d100 in STR, INT, WIS, DEX, CON, CHA order; clamp 30–70. Method B: 30 each +120 allocation points, maximum 70.','10'],
@@ -152,416 +146,328 @@ window.GG_REFERENCE = {
   ]}
 };
 
-/* Grit & Grid — Clerk's Register. Rules checked against uploaded 96-page
- * Contractor's Manual (esp. pp.10–11, 14, 17–24, 26–33, 35, 92–95).
- * Roster and UI are app features; progression and action decisions remain manual.
- */
 
-const SKILL_BASE = Object.freeze({
-    cqc:'str', shi:'dex', arm:'con', ran:'dex',
-    fai:'str', med:'int', res:'wis', voi:'int',
-    tra:'wis', loc:'dex', sne:'dex', trk:'wis',
-    arc:'int', scr:'int', stf:'dex', app:'int'
-});
-const SKILL_LABELS = Object.freeze({
-    cqc:'Close-Quarter Combat', shi:'Shield Deflection', arm:'Heavy Armor Tolerance', ran:'Ranged Precision',
-    fai:'Faith & Clerical Arms', med:'Alchemical Medicine', res:'Congregational Resolve', voi:'Void Pathology',
-    tra:'Trap & Hazard Sensing', loc:'Lock & Mech. Handling', sne:'Sneak & Infiltrate', trk:'Wilderness Tracking',
-    arc:'Arcane Channeling', scr:'Scroll Transcription', stf:'Staff Deflection', app:'Artifact Appraisal'
-});
-const PROFESSIONS = Object.freeze({
-    'Tunnel Miner':{bonuses:{cqc:20,tra:20,arm:10},tool:'Iron Pick'},
-    'Acolyte Expulsee':{bonuses:{res:20,med:20,fai:10},tool:'Carved Symbol of the Stars'},
-    'Borderland Deserter':{bonuses:{sne:20,shi:20,tra:10},tool:'Hemp Rope (50 ft)'},
-    'Grave Robber':{bonuses:{loc:20,sne:20,cqc:10},tool:'Iron Grappling Hook'},
-    'Disgraced Scribe':{bonuses:{scr:20,arc:20,med:10},tool:'3 Empty Glass Vials'},
-    'Forgeworker':{bonuses:{arm:20,shi:20,cqc:10},tool:'Mace/Warhammer'},
-    'Beast Culler':{bonuses:{cqc:20,trk:20,sne:10},tool:'Scavenged Iron Cleaver'},
-    'Route Runner':{bonuses:{trk:20,tra:20,ran:10},tool:'Bag of Caltrops (20)'},
-    'Flesh-Stitcher':{bonuses:{med:20,res:20,voi:10},tool:'Suture Needle & Thread'},
-    'Quartermaster':{bonuses:{app:20,loc:20,scr:10},tool:'Traveling Folio'}
-});
-const CUSTOM_TOOLS = [
-    'Traveling Folio', 'Iron Pick', 'Carved Symbol of the Stars', 'Hemp Rope (50 ft)',
-    'Iron Grappling Hook', '3 Empty Glass Vials', 'Suture Needle & Thread',
-    'Flour Sack (5 lbs)', 'Grease Pot (Lard)', 'Bag of Caltrops (20)'
-];
-let currentLeft='p1', currentRight='p2', lastProfession='', lastTool='';
-let lastDiscipline='none', lastSlotCapacity=0;
-const el = id => document.getElementById(id);
-const asNum = id => Number(el(id)?.value) || 0;
-
-/* Storage must never block the visible interface or reference tables.
-   If a sandbox/browser blocks localStorage, navigation still works.
-   Saving is explicitly reported unavailable; no false success is shown. */
-let storageUnavailable = false;
-function reportStorageBlocked() {
-    storageUnavailable = true;
-    const note = el('storage_status');
-    if (note) {
-        note.hidden = false;
-        note.textContent = 'This browser is blocking local character storage. Dropdowns and reference tables still work, but this session cannot save characters. Open the site where browser storage is permitted to save.';
-    }
-}
-const GGStore = {
+// Storage errors must not disable navigation or the rules dropdown.
+// Keep original gritGrid_char1...char10 keys and all original saved field IDs.
+const safeCharacterStorage = {
     getItem(key) {
-        try { return window.localStorage.getItem(key); }
-        catch (error) { reportStorageBlocked(); return null; }
+        try { return localStorage.getItem(key); }
+        catch (error) { console.warn('Character saves unavailable in this browser:', error); return null; }
     },
-    setItem(key,value) {
-        try { window.localStorage.setItem(key,value); return true; }
-        catch (error) { reportStorageBlocked(); return false; }
+    setItem(key, value) {
+        try { localStorage.setItem(key, value); return true; }
+        catch (error) { console.warn('Could not save character:', error); return false; }
     },
     removeItem(key) {
-        try { window.localStorage.removeItem(key); return true; }
-        catch (error) { reportStorageBlocked(); return false; }
+        try { localStorage.removeItem(key); return true; }
+        catch (error) { console.warn('Could not clear character:', error); return false; }
     }
 };
 
-
 function switchTab(tabName) {
-    const allowed = ['sheet', 'inv', 'magic', 'ref'];
-    if (!allowed.includes(tabName)) return;
-    for (const name of allowed) {
-        const tab = el('tab_' + name), button = el('tab_btn_' + name);
-        if (tab) tab.classList.toggle('active-tab', name === tabName);
-        if (button) {
-            button.classList.toggle('active', name === tabName);
-            button.setAttribute('aria-selected', String(name === tabName));
-        }
-    }
-    document.body.classList.add('js-ready');
-}
-function getActiveSlotKey() {return el('charSlotSelect')?.value || 'char1';}
-const saveQuery='#tab_sheet input, #tab_inv input, #tab_magic input, #tab_sheet select, #tab_inv select, #tab_magic select, #tab_sheet textarea, #tab_inv textarea, #tab_magic textarea';
-const derivedIds = new Set(['backpack_notes','spl_max','total_dr']);
-function savedFields() {return Array.from(document.querySelectorAll(saveQuery)).filter(n=>n.id&&!derivedIds.has(n.id)&&!n.id.startsWith('lib') || false).concat(
-    Array.from(document.querySelectorAll(saveQuery)).filter(n=>/^lib\d+_[lns]$/.test(n.id))
-);}
-function readCharacterData() {
-    const data={__sheetVersion:2};
-    for(const node of savedFields()) data[node.id]=node.type==='checkbox'?node.checked:node.value;
-    return data;
-}
-function saveCharacterSlot() {
-    const key=getActiveSlotKey();
-    try {
-        if (!GGStore.setItem('gritGrid_'+key,JSON.stringify(readCharacterData()))) {
-            alert('Character not saved: this browser does not permit local storage.');
-            return;
-        }
-        alert('Contractor dossier saved to '+el('charSlotSelect').selectedOptions[0].text+'.');
-    } catch(err) {alert('Unable to save this dossier: '+err.message);}
-}
-function defaultFields() {
-    for (const node of savedFields()) {
-        if(node.type==='checkbox') node.checked=false;
-        else if(node.tagName==='SELECT') node.selectedIndex=0;
-        else if(node.type==='number') node.value=node.id.startsWith('stat_')?'30':'0';
-        else node.value='';
-    }
-    for(const id of ['char_currHp','char_maxHp']) el(id).value='6'; // baseline CON 30 => 3 + 3 HP
-    el('char_rank').value='Rank 10 (Slag)';
-    el('inv_backpack').value='Normal';el('grimoire_type').value='10';
-    el('inv_gold').value='0';el('inv_silver').value='20';el('inv_copper').value='0';
-    el('cons_torches').value='3';el('cons_rations').value='7';
-    ['Waterskin (5 charges)','Tinderbox','Mundane Torches (3)','Iron Rations (7 days)','Slag Rank Tag']
-        .forEach((item,i)=>{el('inv_s'+(i+1)).value=item;});
-    for(let n=1;n<=5;n++) el('water_'+n).checked=true;
-    for(const n of ['custom_major1','custom_major2','custom_minor','custom_tool']) el(n).value='';
-}
-function migrateLegacyData(data) {
-    // Original JS stored background bonuses inside bon_*; remove only once.
-    if(!data || Number(data.__sheetVersion)>=2) return data;
-    const copy={...data,__sheetVersion:2};
-    // Old phone HTML used cons_anti, before aligning with desktop's cons_antidote.
-    if (copy.cons_antidote===undefined && copy.cons_anti!==undefined) {
-        copy.cons_antidote=copy.cons_anti;
-    }
-    const bonuses=PROFESSIONS[copy.char_prof_select]?.bonuses||{};
-    for(const [id,n] of Object.entries(bonuses)) {
-        const k='bon_'+id;
-        if(copy[k]!==undefined) copy[k]=String(Math.max(0,(Number(copy[k])||0)-n));
-    }
-    // Legacy inv_gold was labeled gp but defaulted to 20 (manual's 20 sp).
-    // Monetary figures cannot safely be converted without knowing whether user edited them.
-    // Existing gp is preserved. New sp defaults remain 20 until the user reviews it.
-    return copy;
-}
-function switchCharacterSlot() {
-    const key=getActiveSlotKey();
-    defaultFields();
-    const raw=GGStore.getItem('gritGrid_'+key);
-    if(raw) {
-        try {
-            const d=migrateLegacyData(JSON.parse(raw));
-            for(const node of savedFields()) {
-                if(d[node.id]!==undefined) {
-                    if(node.type==='checkbox') node.checked=Boolean(d[node.id]);
-                    else node.value=d[node.id];
-                }
-            }
-            if(Number(JSON.parse(raw).__sheetVersion||0)<2) {
-                const banner=el('legacy_notice');
-                if(banner) banner.textContent='Legacy save loaded: profession training has been separated from free training. Verify saved gp/sp balances, shield threshold, and starting equipment before saving.';
-            } else if(el('legacy_notice')) el('legacy_notice').textContent='';
-        } catch(err) {alert('Unable to read saved slot; displaying new character defaults: '+err.message);}
-    } else if(el('legacy_notice')) el('legacy_notice').textContent='';
-    lastProfession=el('char_prof_select').value;
-    lastTool=getCurrentProfessionTool();
-    lastDiscipline=el('caster_disc').value;
-    lastSlotCapacity=lastDiscipline==='arcane'?Math.floor(asNum('stat_int')/10):lastDiscipline==='sanctified'?Math.floor(asNum('stat_wis')/10):0;
-    showCustomPackage();toggleMasterBackpack();toggleGrimoireSize();
-    calcSkills();calcSpellCapacity();updateArmorDR();updateWaterskinCount();
-}
-function createNewCharacterSlot() {
-    if(confirm('Permanently clear this roster slot?')) {
-        if (!GGStore.removeItem('gritGrid_'+getActiveSlotKey())) {
-            alert('Cannot clear a saved slot while browser storage is blocked.');
-            return;
-        }
-        switchCharacterSlot();alert('Slot cleared.');
-    }
-}
-function moveSlot(dest,reason) {
-    const from=getActiveSlotKey();
-    if(from===dest) return alert('Already in that slot.');
-    const data=GGStore.getItem('gritGrid_'+from);
-    if(!data) return alert('Save the current character first.');
-    if(!confirm(reason+' This moves the saved dossier. Continue?')) return;
-    if(GGStore.getItem('gritGrid_'+dest) && !confirm('Destination contains a saved character. Overwrite it?')) return;
-    if (!GGStore.setItem('gritGrid_'+dest,data)) { alert('Unable to move character: browser storage is blocked.'); return; }
-    if (!GGStore.removeItem('gritGrid_'+from)) { alert('Could not remove the original slot; verify the roster before continuing.'); return; }
-    el('charSlotSelect').value=dest;switchCharacterSlot();
-}
-function setAsActive() {moveSlot('char1','Move to Active Contractor?');}
-function backupCharacter() {
-    if(['char2','char3','char4','char5'].includes(getActiveSlotKey())) return alert('Already in Backup.');
-    const dest=[2,3,4,5].map(n=>'char'+n).find(k=>!GGStore.getItem('gritGrid_'+k));
-    if(!dest) return alert('Backup roster is full.');moveSlot(dest,'Move to Backup roster?');
-}
-function archiveCharacter() {
-    if(['char8','char9','char10'].includes(getActiveSlotKey())) return alert('Already in Morgue.');
-    const dest=[8,9,10].map(n=>'char'+n).find(k=>!GGStore.getItem('gritGrid_'+k));
-    if(!dest) return alert('Morgue roster is full.');moveSlot(dest,'Send to Morgue?');
-}
-function fillCustomOptions() {
-    for(const id of ['custom_major1','custom_major2','custom_minor']) {
-        const s=el(id);s.innerHTML='';s.add(new Option('— choose skill —',''));
-        for(const [key,name] of Object.entries(SKILL_LABELS))s.add(new Option(name,key));
-    }
-    const s=el('custom_tool');s.innerHTML='';s.add(new Option('— choose approved tool —',''));
-    for(const tool of CUSTOM_TOOLS)s.add(new Option(tool,tool));
-}
-function getCurrentProfessionTool() {
-    const p=el('char_prof_select').value;
-    if(p==='Custom')return el('custom_tool').value;
-    return PROFESSIONS[p]?.tool||'';
-}
-function showCustomPackage() {
-    const custom=el('char_prof_select').value==='Custom';
-    el('char_prof_custom').style.display=custom?'block':'none';
-    el('custom_package').style.display=custom?'block':'none';
-}
-function autoFillProfession() {
-    const p=el('char_prof_select').value;
-    showCustomPackage();
-    const newTool=getCurrentProfessionTool();
-    if(lastTool && lastTool!==newTool) {
-        const found=Array.from({length:12},(_,i)=>el('inv_s'+(i+1))).find(n=>n?.value===lastTool);
-        if(found) found.value='';
-    }
-    if(newTool && lastTool!==newTool) {
-        const free=Array.from({length:12},(_,i)=>el('inv_s'+(i+1))).find(n=>!n?.value.trim());
-        if(free) free.value=newTool;
-        else alert('No empty inventory row for the profession tool. Record the granted tool manually.');
-    }
-    lastProfession=p;lastTool=newTool;calcSkills();
-}
-function getProfessionBonuses() {
-    const p=el('char_prof_select').value;
-    if(p!=='Custom') return PROFESSIONS[p]?.bonuses||{};
-    const vals=[el('custom_major1').value,el('custom_major2').value,el('custom_minor').value];
-    const totals={};
-    vals.forEach((id,i)=>{if(id) totals[id]=(totals[id]||0)+(i===2?10:20);});
-    return totals;
-}
-function calcSkills() {
-    const prof=getProfessionBonuses();let free=0,warning=[];
-    for(const [id,base] of Object.entries(SKILL_BASE)) {
-        const core=asNum('stat_'+base),pro=prof[id]||0;
-        const f=asNum('bon_'+id),promotion=asNum('adv_'+id);
-        free+=f;
-        if(f<0||f>20) warning.push(SKILL_LABELS[id]+' free allocation must be 0–20 at creation');
-        if(promotion<0) warning.push(SKILL_LABELS[id]+' promotion training cannot be negative');
-        const total=Math.min(80,core+pro+f+promotion);
-        if(el('b_'+id)) el('b_'+id).textContent=core;
-        if(el('prof_'+id))el('prof_'+id).textContent=pro;
-        if(el('t_'+id))el('t_'+id).textContent=total;
-    }
-    const rank=Number((el('char_rank').value.match(/\d+/)||['10'])[0]);
-    const cap=rank>=7?70:Infinity; // PDF only states the Rank 10–7 cap; no new numeric cap is assigned after Rank 6.
-    for(const id of ['str','dex','con','int','wis','cha']){
-        const n=asNum('stat_'+id);
-        if(n>cap) warning.push(id.toUpperCase()+' exceeds the Rank '+rank+' capability cap '+cap);
-        if(n<0) warning.push(id.toUpperCase()+' cannot be negative');
-    }
-    if(free>50) warning.push('Free training exceeds the starting allowance of 50 points.');
-    if(el('char_prof_select').value==='Custom') {
-        const [a,b,c]=['custom_major1','custom_major2','custom_minor'].map(k=>el(k).value);
-        if(a&&b&&a===b)warning.push('Appendix B describes two Major specializations; select two different skills.');
-        if(!a||!b||!c)warning.push('Custom profession needs two Major and one Minor specialization.');
-    }
-    const msg='Creation free points used: '+free+'/50. '+(warning.length?'Review: '+warning.join('; '):'Standard total vocational skill ceiling: 80%.');
-    const target=el('training_summary'); if(target) {target.textContent=msg;target.classList.toggle('rule-warning',warning.length>0);}
-    calcSpellCapacity();
-}
-function setStartingHP() {
-    if(!confirm('Replace current and maximum HP with new-contractor starting HP? This does not include promotion HP.'))return;
-    const hp=Math.floor(Math.max(0,asNum('stat_con'))/10)+3;
-    el('char_maxHp').value=hp;el('char_currHp').value=hp;
-}
-function calcSpellCapacity() {
-    const discipline=el('caster_disc').value;
-    const max=discipline==='arcane'?Math.floor(asNum('stat_int')/10):discipline==='sanctified'?Math.floor(asNum('stat_wis')/10):0;
-    el('spl_max').value=Math.max(0,max);
-    const disciplineChanged=discipline!==lastDiscipline;
-    for(let i=1;i<=10;i++) {
-        const cb=el('sp_s'+i);if(!cb)continue;
-        const on=i<=max;
-        if(!on) cb.checked=false;
-        else if(disciplineChanged || i>lastSlotCapacity) cb.checked=true;
-        cb.disabled=!on;
-    }
-    lastDiscipline=discipline;
-    lastSlotCapacity=max;
-}
-function updateArmorDR() {
-    const sunders=[1,2,3].filter(i=>el('arm_c'+i).checked).length;
-    const base=Math.max(0,asNum('arm_d'));
-    const strain=el('path_cog').checked?2:0;
-    el('total_dr').value=sunders===3?0:Math.max(0,base-sunders-strain);
-}
-const ATTACHMENT_RULES = Object.freeze({
-    'Exterior Cargo Loops':'Four outside lash-points; no internal Slots. Inaccessible in combat; exposed to harm.',
-    'Sconce Rig':'Hands-free 360° light at normal source range. While lit: completely ruins stealth.',
-    'Iron-Plate Baffle':'Once/encounter protects up to 1 Slot of packed items against one rear equipment-damaging trap or ambush; does NOT protect HP or worn gear.',
-    'Oiled-Hide Water-Seal':'Protects packed gear from moisture, slime and acid while intact; puncture can trap moisture.',
-    'Quiver-Latch':'Secures a heavy secondary weapon. Drawing takes an EXTRA tactical action.',
-    'Apothecary Tray':'Cushions glass vials. Occupies 2 of the 12 internal Slots permanently (10 remain).',
-    'Bedroll & Camp Sling':'Underslung bedroll/pot lower center of gravity; remove applicable ledge-balance penalties; pack becomes wider.',
-    'Drop-Away Release':'Quick-release drops the entire pack immediately. All backpack equipment/loot stays behind.',
-    'Signal-Bell':'Tripwire perimeter warning. −10% to eligible Sneak in ULTRA-QUIET dungeons ONLY.',
-    'Scavenger Hook':'Harvest cleanly. Unwashed organic gore attracts scent-tracking predators from farther away.'
-});
-function updateBackpackNotes() {
-    const a=el('inv_attach1').value,b=el('inv_attach2').value;
-    el('backpack_notes').value=[a,b].filter(x=>x&&x!=='None').map((x,i)=>(i+1)+'. '+ATTACHMENT_RULES[x]).join('\n');
-    el('inventory_capacity').textContent='Internal backpack capacity: '+([a,b].includes('Apothecary Tray')?'10':'12')+' Slots (Master pack: same 12; Apothecary Tray permanently costs 2). Item entries may be ½, 1, 2, or more Slots as printed; one row is NOT necessarily one Slot.';
-}
-function toggleMasterBackpack() {
-    const master=el('inv_backpack').value==='Master';
-    el('masterBackpackAttachments').style.display=master?'block':'none';
-    if(!master){
-        if(el('inv_attach1').value!=='None'||el('inv_attach2').value!=='None') {
-            // Keep saved selections so changing pack type does not destroy user data;
-            // but only installed Master-Grade attachments are active.
-            el('backpack_notes').value='Attachments require the Master-Grade Backpack to be active.';
-        }
-        el('inventory_capacity').textContent='Basic Backpack: 12 internal Slots; selected Master-Grade attachments are inactive.';
-    } else updateBackpackNotes();
-}
-function updateSpellPages() {
-    let used=0,filled=0,invalid=[];
-    for(let i=1;i<=30;i++){
-        const name=el('lib'+i+'_n').value.trim(),lvlStr=el('lib'+i+'_l').value;
-        const row=el('lib'+i+'_p');
-        if(!name){row.value='';continue;}
-        const lvl=Number(lvlStr);
-        if(lvlStr===''||!Number.isInteger(lvl)||lvl<0||lvl>3){invalid.push(i);row.value='';continue;}
-        const pages=Math.max(1,lvl);row.value=pages;used+=pages;filled++;
-    }
-    const limit=Number(el('grimoire_type').value)||10;
-    const notes=['Pages occupied: '+used+' / '+limit+'.','Entries recorded: '+filled+'.'];
-    if(used>limit)notes.push('OVER CAPACITY: a spell must fit entirely in ONE physical book.');
-    if(invalid.length)notes.push('Set a valid level (0–3) for lines: '+invalid.join(', ')+'.');
-    const s=el('spell_page_summary');s.textContent=notes.join(' ');s.classList.toggle('rule-warning',used>limit||invalid.length>0);
-}
-function toggleGrimoireSize() {
-    // A folio has 10 PAGES, not a maximum of 10 different rows/spells.
-    // Keep all 30 possible inscription rows accessible; validate pages used.
-    for(let i=1;i<=30;i++)if(el('grim_row_'+i))el('grim_row_'+i).style.display='table-row';
-    updateSpellPages();
-}
-function updateWaterskinCount() {
-    const count=[1,2,3,4,5].filter(i=>el('water_'+i).checked).length;
-    el('water_count').textContent=count+'/5';
-}
-function unbiasedDie(max) {
-    // Uniform uint32 rejection sampling avoids modulo bias.
-    const limit=Math.floor(4294967296/max)*max;const buf=new Uint32Array(1);
-    do{window.crypto.getRandomValues(buf);}while(buf[0]>=limit);
-    return(buf[0]%max)+1;
-}
-function toggleDiceModal() {
-    const modal=el('diceModal'); if (!modal) return;
-    const opening = getComputedStyle(modal).display === 'none';
-    modal.style.display = opening ? 'flex' : 'none';
-    modal.setAttribute('aria-hidden', String(!opening));
-}
-function mobileRoll(type) {
-    const max = type==='d100'?100:10, result=unbiasedDie(max);
-    const output=el('mobile_dice_output'); if(!output)return;
-    const units = result%10;
-    const doubles = result===100 || (result >= 11 && Math.floor(result/10)===units);
-    let detail=type==='d100'?`Units digit: ${units}.`:'Standard d10 result.';
-    if (type==='d100' && doubles) detail+=' Doubles: check critical rules if this is a successful attack.';
-    if (type==='d100' && [2,3,4].includes(units)) detail+=' Possible Notch only for a successful melee hit; exceptions may apply.';
-    output.textContent=type+' Result: '+result+' — '+detail;
-}
-function showRefCategory() {
-    const category=el('ref_categorySelect')?.value;
-    const data=window.GG_REFERENCE?.[category],container=el('store_container');
-    if(!container)return;
-    if(!data){container.textContent='No entry found in the current rules reference.';return;}
-    const escape=s=>String(s).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
-    let out='<div class="table-scroller"><table class="store-table"><thead><tr>'+
-        data.headers.map(x=>'<th>'+escape(x)+'</th>').join('')+'</tr></thead><tbody>';
-    out+=data.rows.map(row=>'<tr>'+row.map(v=>'<td>'+escape(v)+'</td>').join('')+'</tr>').join('');
-    out+='</tbody></table></div><p class="rule-note">Page references identify the uploaded Contractor’s Manual. Consult the complete printed entry when adjudicating unusual interactions.</p>';
-    container.innerHTML=out;
+    document.getElementById('tab_sheet').classList.remove('active-tab');
+    document.getElementById('tab_inv').classList.remove('active-tab');
+    document.getElementById('tab_magic').classList.remove('active-tab');
+    document.getElementById('tab_ref').classList.remove('active-tab');
+
+    document.getElementById('tab_btn_sheet').classList.remove('active');
+    document.getElementById('tab_btn_inv').classList.remove('active');
+    document.getElementById('tab_btn_magic').classList.remove('active');
+    document.getElementById('tab_btn_ref').classList.remove('active');
+
+    document.getElementById('tab_' + tabName).classList.add('active-tab');
+    document.getElementById('tab_btn_' + tabName).classList.add('active');
 }
 
-/** Generate repetitive sheet rows on load. No JavaScript is embedded in HTML. */
-function createDossierRows() {
-    const cantripRows=el('cantrip_rows');
-    const grimoireRows=el('grimoire_rows');
-    const inventoryRows=el('inventory_rows');
-    if(cantripRows && !cantripRows.children.length) cantripRows.innerHTML=Array.from({length:8},(_,index)=>{
-        const i=index+1;
-        return `<tr><td>${i}.</td><td><input id="can${i}_n" style="width:90%;"></td><td><input id="can${i}_f" style="width:90%;"></td><td><input id="can${i}_e" style="width:95%;"></td></tr>`;
-    }).join('');
-    if(grimoireRows && !grimoireRows.children.length) grimoireRows.innerHTML=Array.from({length:30},(_,index)=>{
-        const i=index+1;
-        return `<tr id="grim_row_${i}"><td>${i}.</td><td><input id="lib${i}_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:65px;"></td><td><input id="lib${i}_n" style="width:90%;" oninput="updateSpellPages()"></td><td><input id="lib${i}_p" style="width:65px;" readonly></td><td><input id="lib${i}_s" style="width:95%;"></td></tr>`;
-    }).join('');
-    if(inventoryRows && !inventoryRows.children.length) inventoryRows.innerHTML=Array.from({length:12},(_,index)=>{
-        const i=index+1;
-        return `<tr><td>${i}.</td><td><input id="inv_s${i}" style="width:95%;"></td></tr>`;
-    }).join('');
+let lastProfession = ""; 
+
+function getActiveSlotKey() {
+    const slotSelect = document.getElementById('charSlotSelect');
+    return slotSelect ? slotSelect.value : 'char1';
+}
+
+function saveCharacterSlot() {
+    const slotKey = getActiveSlotKey();
+    const charData = {};
+    const query = 'input, select, textarea';
+    const inputs = document.querySelectorAll(query);
+
+    inputs.forEach(el => {
+        if (el.id && !['charSlotSelect', 'ref_categorySelect', 'backpack_notes'].includes(el.id)) {
+            if (el.type === 'checkbox') charData[el.id] = el.checked;
+            else charData[el.id] = el.value;
+        }
+    });
+
+    if (!safeCharacterStorage.setItem('gritGrid_' + slotKey, JSON.stringify(charData))) {
+        alert('Browser storage is blocked. The dossier remains visible, but this save did not complete.');
+        return;
+    }
+    const slotName = document.getElementById('charSlotSelect').options[document.getElementById('charSlotSelect').selectedIndex].text;
+    alert('Contractor dossier saved to ' + slotName + '!');
+}
+
+function switchCharacterSlot() {
+    const slotKey = getActiveSlotKey();
+    const saved = safeCharacterStorage.getItem('gritGrid_' + slotKey);
+    const query = 'input, select, textarea';
+    const inputs = document.querySelectorAll(query);
+
+    if (saved) {
+        const charData = JSON.parse(saved);
+        inputs.forEach(el => {
+            if (charData[el.id] !== undefined) {
+                if (el.type === 'checkbox') el.checked = charData[el.id];
+                else el.value = charData[el.id];
+            }
+        });
+    } else {
+        inputs.forEach(el => {
+            if (['charSlotSelect', 'ref_categorySelect', 'backpack_notes'].includes(el.id)) return;
+            if (el.type === 'checkbox') el.checked = false;
+            else if (el.tagName === 'SELECT') el.selectedIndex = 0;
+            else if (el.type === 'number') el.value = (el.id.startsWith('stat_')) ? '30' : '';
+            else el.value = '';
+        });
+        document.getElementById('char_currHp').value = '6';
+        document.getElementById('char_maxHp').value = '6';
+        document.getElementById('inv_gold').value = '20';
+    }
+
+    const profSelect = document.getElementById('char_prof_select');
+    lastProfession = profSelect ? profSelect.value : "";
+    const customBox = document.getElementById('char_prof_custom');
+    if (profSelect && profSelect.value === 'Custom') customBox.style.display = 'block';
+    else if (customBox) customBox.style.display = 'none';
+
+    toggleMasterBackpack();
+    toggleGrimoireSize();
+    calcSkills();
+}
+
+function createNewCharacterSlot() {
+    if (confirm("Are you sure you want to clear this slot permanently?")) {
+        safeCharacterStorage.removeItem('gritGrid_' + getActiveSlotKey());
+        switchCharacterSlot();
+        alert("Slot cleared!");
+    }
+}
+
+function setAsActive() {
+    const currentSlot = getActiveSlotKey();
+    if (currentSlot === 'char1') return alert("Already Active!");
+    if (confirm("Move to Active Contractor?")) {
+        const savedData = safeCharacterStorage.getItem('gritGrid_' + currentSlot);
+        if (savedData) {
+            if (!safeCharacterStorage.setItem('gritGrid_char1', savedData) ||
+                !safeCharacterStorage.removeItem('gritGrid_' + currentSlot)) {
+                alert('Storage blocked. Roster change was not completed.');
+                return;
+            }
+            document.getElementById('charSlotSelect').value = 'char1';
+            switchCharacterSlot();
+            alert("Now Active!");
+        } else { alert("Save first!"); }
+    }
+}
+
+function backupCharacter() {
+    const currentSlot = getActiveSlotKey();
+    if (['char2', 'char3', 'char4', 'char5'].includes(currentSlot)) return alert("Already in Backup!");
+    if (confirm("Move to Backup Roster?")) {
+        const savedData = safeCharacterStorage.getItem('gritGrid_' + currentSlot);
+        if (savedData) {
+            let targetSlot = null;
+            for (let i = 2; i <= 5; i++) {
+                if (!safeCharacterStorage.getItem('gritGrid_char' + i)) { targetSlot = 'char' + i; break; }
+            }
+            if (!targetSlot) return alert("Backup Roster full!");
+            if (!safeCharacterStorage.setItem('gritGrid_' + targetSlot, savedData) ||
+                !safeCharacterStorage.removeItem('gritGrid_' + currentSlot)) {
+                alert('Storage blocked. Roster change was not completed.');
+                return;
+            }
+            switchCharacterSlot();
+            alert("Moved to " + targetSlot + "!");
+        } else { alert("Save first!"); }
+    }
+}
+
+function archiveCharacter() {
+    const currentSlot = getActiveSlotKey();
+    if (['char8', 'char9', 'char10'].includes(currentSlot)) return alert("Already in Morgue!");
+    if (confirm("Send to Morgue?")) {
+        const savedData = safeCharacterStorage.getItem('gritGrid_' + currentSlot);
+        if (savedData) {
+            let targetSlot = null;
+            for (let i = 8; i <= 10; i++) {
+                if (!safeCharacterStorage.getItem('gritGrid_char' + i)) { targetSlot = 'char' + i; break; }
+            }
+            if (!targetSlot) return alert("Morgue full!");
+            if (!safeCharacterStorage.setItem('gritGrid_' + targetSlot, savedData) ||
+                !safeCharacterStorage.removeItem('gritGrid_' + currentSlot)) {
+                alert('Storage blocked. Roster change was not completed.');
+                return;
+            }
+            switchCharacterSlot();
+            alert("Moved to " + targetSlot + "!");
+        } else { alert("Save first!"); }
+    }
+}
+
+function autoFillProfession() {
+    const profSelect = document.getElementById('char_prof_select');
+    const customBox = document.getElementById('char_prof_custom');
+    const newProf = profSelect.value;
+    if (newProf === 'Custom') customBox.style.display = 'block';
+    else { customBox.style.display = 'none'; customBox.value = ''; }
+
+    const dict = {
+        "Tunnel Miner": { bonuses: { cqc: 20, tra: 20, arm: 10 }, tool: "Iron Pick" },
+        "Acolyte Expulsee": { bonuses: { res: 20, med: 20, fai: 10 }, tool: "Carved Symbol of the Stars" },
+        "Borderland Deserter": { bonuses: { sne: 20, shi: 20, tra: 10 }, tool: "Hemp Rope (50 ft)" },
+        "Grave Robber": { bonuses: { loc: 20, sne: 20, cqc: 10 }, tool: "Iron Grappling Hook" },
+        "Disgraced Scribe": { bonuses: { scr: 20, arc: 20, med: 10 }, tool: "3 Empty Glass Vials" },
+        "Forgeworker": { bonuses: { arm: 20, shi: 20, cqc: 10 }, tool: "Mace/Warhammer" },
+        "Beast Culler": { bonuses: { cqc: 20, trk: 20, sne: 10 }, tool: "Scavenged Iron Cleaver" },
+        "Route Runner": { bonuses: { trk: 20, tra: 20, ran: 10 }, tool: "Bag of Caltrops (20)" },
+        "Flesh-Stitcher": { bonuses: { med: 20, res: 20, voi: 10 }, tool: "Suture Needle & Thread" },
+        "Quartermaster": { bonuses: { app: 20, loc: 20, scr: 10 }, tool: "Traveling Folio" }
+    };
+
+    if (lastProfession && lastProfession !== "Custom" && dict[lastProfession]) {
+        const oldData = dict[lastProfession];
+        for (const [skillId, value] of Object.entries(oldData.bonuses)) {
+            const input = document.getElementById('bon_' + skillId);
+            if (input) input.value = Math.max(0, (parseInt(input.value) || 0) - value);
+        }
+        for (let i = 1; i <= 12; i++) {
+            const invSlot = document.getElementById('inv_s' + i);
+            if (invSlot && invSlot.value === oldData.tool) { invSlot.value = ""; break; }
+        }
+    }
+
+    if (newProf && newProf !== "Custom" && dict[newProf]) {
+        const newData = dict[newProf];
+        for (const [skillId, value] of Object.entries(newData.bonuses)) {
+            const input = document.getElementById('bon_' + skillId);
+            if (input) input.value = (parseInt(input.value) || 0) + value;
+        }
+        for (let i = 1; i <= 12; i++) {
+            const invSlot = document.getElementById('inv_s' + i);
+            if (invSlot && invSlot.value.trim() === "") { invSlot.value = newData.tool; break; }
+        }
+    }
+    lastProfession = newProf;
+    calcSkills();
+}
+
+function calcSkills() {
+    const getVal = (id) => { const el = document.getElementById(id); return el ? parseInt(el.value) || 0 : 0; };
+    const str = getVal('stat_str'), dex = getVal('stat_dex'), int = getVal('stat_int');
+    const wis = getVal('stat_wis'), con = getVal('stat_con'), cha = getVal('stat_cha');
+
+    const skills = [
+        { id: 'cqc', stat: str }, { id: 'shi', stat: dex }, { id: 'arm', stat: con }, { id: 'ran', stat: dex },
+        { id: 'fai', stat: str }, { id: 'med', stat: int }, { id: 'res', stat: wis }, { id: 'voi', stat: int },
+        { id: 'tra', stat: wis }, { id: 'loc', stat: dex }, { id: 'sne', stat: dex }, { id: 'trk', stat: wis },
+        { id: 'arc', stat: int }, { id: 'scr', stat: int }, { id: 'stf', stat: dex }, { id: 'app', stat: int }
+    ];
+
+    skills.forEach(sk => {
+        const baseSpan = document.getElementById(`b_${sk.id}`);
+        const totalSpan = document.getElementById(`t_${sk.id}`);
+        const bonusInput = getVal(`bon_${sk.id}`);
+        if (baseSpan && totalSpan) {
+            baseSpan.innerText = sk.stat;
+            totalSpan.innerText = Math.min(80, sk.stat + bonusInput);
+        }
+    });
+}
+
+// ==========================================
+// RESTORED BACKPACK & GRIMOIRE LOGIC
+// ==========================================
+function updateBackpackNotes() {
+    const a1 = document.getElementById('inv_attach1').value;
+    const a2 = document.getElementById('inv_attach2').value;
+    const notesBox = document.getElementById('backpack_notes');
+    const bpDict = {
+        "Exterior Cargo Loops": "Adds 4 exterior lash-points. Cannot be accessed in combat.",
+        "Sconce Rig": "Hands-free 360 light. Ruins stealth checks entirely.",
+        "Iron-Plate Baffle": "Once per encounter, protects up to 1 packed Slot from one rear gear-damaging ambush/trap. Does not prevent HP damage.",
+        "Oiled-Hide Water-Seal": "Protects against slime/rot. If punctured, traps moisture.",
+        "Quiver-Latch": "Secures a heavy secondary weapon; drawing it takes an EXTRA tactical action.",
+        "Apothecary Tray": "Protects packed glass vials. Permanently consumes 2 of the backpack’s 12 internal Slots.",
+        "Bedroll & Camp Sling": "Lowers center of gravity and helps with ledge balance. Makes the pack physically wider.",
+        "Drop-Away Release": "Instantly drop backpack in emergencies. Your gear is left behind.",
+        "Signal-Bell": "Wire bell warns camp; −10% to eligible Sneak checks in ULTRA-QUIET dungeons only.",
+        "Scavenger Hook": "Keeps harvest clean; if unwashed, gore/musk attracts scent-tracking predators."
+    };
+    let result = "";
+    if (a1 !== "None" && bpDict[a1]) result += "1. " + bpDict[a1] + "\n";
+    if (a2 !== "None" && bpDict[a2]) result += "2. " + bpDict[a2] + "\n";
+    if (notesBox) notesBox.value = result.trim();
+}
+
+function toggleMasterBackpack() {
+    const bp = document.getElementById('inv_backpack');
+    const menu = document.getElementById('masterBackpackAttachments');
+    if (bp && menu) {
+        menu.style.display = (bp.value === 'Master') ? 'block' : 'none';
+        if (bp.value === 'Master') updateBackpackNotes();
+    }
+}
+
+function toggleGrimoireSize() {
+    const type = document.getElementById('grimoire_type');
+    if (!type) return;
+    for (let i = 11; i <= 30; i++) {
+        const row = document.getElementById('grim_row_' + i);
+        if (row) row.style.display = (type.value === '30') ? 'table-row' : 'none';
+    }
+}
+
+// ==========================================
+// DICE ROLLER & REFERENCE DATABASE
+// ==========================================
+function toggleDiceModal() {
+    const modal = document.getElementById('diceModal');
+    if (modal) modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+}
+
+function mobileRoll(type) {
+    let result = 0;
+    if (type === 'd100') result = Math.floor(Math.random() * 100) + 1;
+    if (type === 'd10') result = Math.floor(Math.random() * 10) + 1;
+    const units = result % 10;
+    const output = document.getElementById('mobile_dice_output');
+    if (output) {
+        output.innerHTML = `<b>${type} Result:</b> <span style="color:#F26522; font-size:18px;">${result}</span><br><span style="font-size:12px; color:#aaa;">Units Digit: ${units} (damage if attack hits; Notch only on successful melee hits)</span>`;
+    }
+}
+
+function showRefCategory() {
+    const select = document.getElementById('ref_categorySelect');
+    const container = document.getElementById('store_container');
+    if (!select || !container) return;
+    const data = window.GG_REFERENCE && window.GG_REFERENCE[select.value];
+    if (!data) {
+        container.textContent = 'No reference data for this category.';
+        return;
+    }
+    const escapeCell = (value) => String(value)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    let html = '<div style="overflow-x:auto; max-width:100%;"><table class="store-table"><thead><tr>';
+    html += data.headers.map(h => '<th>' + escapeCell(h) + '</th>').join('');
+    html += '</tr></thead><tbody>';
+    html += data.rows.map(row => '<tr>' + row.map(cell => '<td>' + escapeCell(cell) + '</td>').join('') + '</tr>').join('');
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    const scriptStatus = el('script_status');
-    if (scriptStatus) scriptStatus.hidden = true;
-    try { createDossierRows(); } catch (error) { console.error('Could not create some character fields:', error); }
-    try { fillCustomOptions(); switchCharacterSlot(); } catch (error) { console.error('Character initialization issue:', error); }
-    // Tabs and reference database must initialize even when localStorage is blocked.
-    try { showRefCategory(); } catch (error) { console.error('Reference initialization issue:', error); }
-    try { switchTab('sheet'); } catch (error) { console.error('Tab initialization issue:', error); }
-    for (const id of ['arm_d','arm_c1','arm_c2','arm_c3','path_cog']) el(id)?.addEventListener('change', updateArmorDR);
-    for (let i=1; i<=5; i++) el('water_'+i)?.addEventListener('change', updateWaterskinCount);
-    el('char_rank')?.addEventListener('change', calcSkills);
-    el('diceModal')?.addEventListener('click', event => { if (event.target === el('diceModal')) toggleDiceModal(); });
-    document.addEventListener('keydown', event => { if (event.key === 'Escape' && el('diceModal')?.style.display === 'flex') toggleDiceModal(); });
+    try { showRefCategory(); } catch (error) { console.error('Reference dropdown:', error); }
+    try { switchCharacterSlot(); } catch (error) { console.error('Character load:', error); } 
 });
