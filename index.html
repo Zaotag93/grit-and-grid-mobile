@@ -1,20 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="utf-8">
-    <title>Grit & Grid: Clerk's Register (Phone)</title>
+    <title>Grit & Grid: Clerk's Register</title>
     <link rel="stylesheet" href="phonestyles.css">
 </head>
 
 <body>
     <h1 style="color:white; margin: 10px; font-size: 20px; text-align: center;">Grit & Grid: Clerk's Register</h1>
     
-    <!-- Interactive controls status: hidden as soon as the corresponding JavaScript runs. -->
-    <div id="script_status" role="alert" class="rule-warning" style="padding: 8px; margin-bottom: 8px; border: 1px solid #F26522;">Interface script did not load. Make sure phonescripts.js is in the same folder as index.html, or use the standalone HTML version provided.</div>
-    <div id="storage_status" role="status" aria-live="polite" class="rule-warning" hidden style="padding: 8px; margin-bottom: 8px; border: 1px dashed #F26522;"></div>
-
     <!-- TOP ROSTER MANAGEMENT BAR -->
     <div class="roster-bar">
         <div class="nav-group">
@@ -66,7 +61,6 @@
         <div id="tab_sheet" class="app-tab active-tab">
             <div class="sheet-section">
                 <h2 class="dossier-title">Contractor Dossier</h2>
-                <p id="legacy_notice" class="rule-warning" aria-live="polite"></p>
                 <div class="sheet-row">
                     <label>Name:</label> <input id="char_name" style="flex: 2;" placeholder="Name">
                 </div>
@@ -88,15 +82,6 @@
                     </select>
                     <input id="char_prof_custom" style="flex: 1; display: none;" placeholder="Custom background...">
                 </div>
-                <!-- Optional Appendix B custom profession package -->
-                <div id="custom_package" class="backpack-panel" style="display:none;">
-                    <p class="rule-note">Custom profession: two different +20 Major specializations, one +10 Minor specialization, and an approved tool.</p>
-                    <div class="sheet-row"><label>Major 1 (+20):</label><select id="custom_major1" onchange="calcSkills()"></select></div>
-                    <div class="sheet-row"><label>Major 2 (+20):</label><select id="custom_major2" onchange="calcSkills()"></select></div>
-                    <div class="sheet-row"><label>Minor (+10):</label><select id="custom_minor" onchange="calcSkills()"></select></div>
-                    <div class="sheet-row"><label>Starting Tool:</label><select id="custom_tool" onchange="autoFillProfession()"></select></div>
-                </div>
-
                 <div class="sheet-row">
                     <label>Rank:</label>
                     <select id="char_rank">
@@ -111,9 +96,8 @@
                         <option value="Rank 2 (Void-Forged)">[ 2 ] - Void-Forged</option>
                         <option value="Rank 1 (Astral)">[ 1 ] - Astral</option>
                     </select>
-                    <label style="margin-left: 10px;">HP:</label> <input id="char_currHp" type="number" min="0" style="width:45px;" value="6">
-                    <label>/</label> <input id="char_maxHp" type="number" min="0" style="width:45px;" value="6">
-                    <button class="action-btn" type="button" onclick="setStartingHP()" title="Starting HP = tens digit of CON + 3">Set HP</button>
+                    <label style="margin-left: 10px;">HP:</label> <input id="char_currHp" type="number" style="width:35px;" value="6">
+                    <label>/</label> <input id="char_maxHp" type="number" style="width:35px;" value="6">
                 </div>
 
                 <!-- Core Capabilities -->
@@ -126,42 +110,39 @@
                 </table>
 
                 <!-- Vocational Skills -->
-                <h3 class="section-header">Vocational Skills (Core + Profession + Free + Promotion)</h3>
+                <h3 class="section-header">Vocational Skills (Base + Bonus = Total)</h3>
                 <table class="dossier-table">
-                    <tr><th>Vanguard Suite</th><th>Core + Prof + Free + Rank = Total</th></tr>
-                    <tr><td>Close-Quarter Combat [STR]</td><td class="skill-calc">[<span id="b_cqc">30</span>] + <span class="skill-prof" id="prof_cqc">0</span> + [<input id="bon_cqc" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_cqc" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_cqc">30</span>%</td></tr>
-                    <tr><td>Shield Deflection [DEX]</td><td class="skill-calc">[<span id="b_shi">30</span>] + <span class="skill-prof" id="prof_shi">0</span> + [<input id="bon_shi" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_shi" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_shi">30</span>%</td></tr>
-                    <tr><td>Heavy Armor Tolerance [CON]</td><td class="skill-calc">[<span id="b_arm">30</span>] + <span class="skill-prof" id="prof_arm">0</span> + [<input id="bon_arm" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_arm" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_arm">30</span>%</td></tr>
-                    <tr><td>Ranged Precision [DEX]</td><td class="skill-calc">[<span id="b_ran">30</span>] + <span class="skill-prof" id="prof_ran">0</span> + [<input id="bon_ran" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_ran" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_ran">30</span>%</td></tr>
+                    <tr><th>Vanguard Suite</th><th>Base + Bonus = Total</th></tr>
+                    <tr><td>Close-Quarter Combat [STR]</td><td class="skill-calc">[<span id="b_cqc">30</span>]+[<input id="bon_cqc" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_cqc">30</span>%</td></tr>
+                    <tr><td>Shield Deflection [DEX]</td><td class="skill-calc">[<span id="b_shi">30</span>]+[<input id="bon_shi" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_shi">30</span>%</td></tr>
+                    <tr><td>Heavy Armor Tolerance [CON]</td><td class="skill-calc">[<span id="b_arm">30</span>]+[<input id="bon_arm" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_arm">30</span>%</td></tr>
+                    <tr><td>Ranged Precision [DEX]</td><td class="skill-calc">[<span id="b_ran">30</span>]+[<input id="bon_ran" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_ran">30</span>%</td></tr>
                     
-                    <tr><th>Infiltration Suite</th><th>Core + Prof + Free + Rank = Total</th></tr>
-                    <tr><td>Trap & Hazard Sensing [WIS]</td><td class="skill-calc">[<span id="b_tra">30</span>] + <span class="skill-prof" id="prof_tra">0</span> + [<input id="bon_tra" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_tra" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_tra">30</span>%</td></tr>
-                    <tr><td>Lock & Mech. Handling [DEX]</td><td class="skill-calc">[<span id="b_loc">30</span>] + <span class="skill-prof" id="prof_loc">0</span> + [<input id="bon_loc" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_loc" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_loc">30</span>%</td></tr>
-                    <tr><td>Sneak & Infiltrate [DEX]</td><td class="skill-calc">[<span id="b_sne">30</span>] + <span class="skill-prof" id="prof_sne">0</span> + [<input id="bon_sne" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_sne" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_sne">30</span>%</td></tr>
-                    <tr><td>Wilderness Tracking [WIS]</td><td class="skill-calc">[<span id="b_trk">30</span>] + <span class="skill-prof" id="prof_trk">0</span> + [<input id="bon_trk" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_trk" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_trk">30</span>%</td></tr>
+                    <tr><th>Infiltration Suite</th><th>Base + Bonus = Total</th></tr>
+                    <tr><td>Trap & Hazard Sensing [WIS]</td><td class="skill-calc">[<span id="b_tra">30</span>]+[<input id="bon_tra" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_tra">30</span>%</td></tr>
+                    <tr><td>Lock & Mech. Handling [DEX]</td><td class="skill-calc">[<span id="b_loc">30</span>]+[<input id="bon_loc" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_loc">30</span>%</td></tr>
+                    <tr><td>Sneak & Infiltrate [DEX]</td><td class="skill-calc">[<span id="b_sne">30</span>]+[<input id="bon_sne" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_sne">30</span>%</td></tr>
+                    <tr><td>Wilderness Tracking [WIS]</td><td class="skill-calc">[<span id="b_trk">30</span>]+[<input id="bon_trk" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_trk">30</span>%</td></tr>
 
-                    <tr><th>Sanctified Suite</th><th>Core + Prof + Free + Rank = Total</th></tr>
-                    <tr><td>Faith & Clerical Arms [STR]</td><td class="skill-calc">[<span id="b_fai">30</span>] + <span class="skill-prof" id="prof_fai">0</span> + [<input id="bon_fai" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_fai" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_fai">30</span>%</td></tr>
-                    <tr><td>Alchemical Medicine [INT]</td><td class="skill-calc">[<span id="b_med">30</span>] + <span class="skill-prof" id="prof_med">0</span> + [<input id="bon_med" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_med" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_med">30</span>%</td></tr>
-                    <tr><td>Congregational Resolve [WIS]</td><td class="skill-calc">[<span id="b_res">30</span>] + <span class="skill-prof" id="prof_res">0</span> + [<input id="bon_res" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_res" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_res">30</span>%</td></tr>
-                    <tr><td>Void Pathology [INT]</td><td class="skill-calc">[<span id="b_voi">30</span>] + <span class="skill-prof" id="prof_voi">0</span> + [<input id="bon_voi" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_voi" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_voi">30</span>%</td></tr>
+                    <tr><th>Sanctified Suite</th><th>Base + Bonus = Total</th></tr>
+                    <tr><td>Faith & Clerical Arms [STR]</td><td class="skill-calc">[<span id="b_fai">30</span>]+[<input id="bon_fai" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_fai">30</span>%</td></tr>
+                    <tr><td>Alchemical Medicine [INT]</td><td class="skill-calc">[<span id="b_med">30</span>]+[<input id="bon_med" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_med">30</span>%</td></tr>
+                    <tr><td>Congregational Resolve [WIS]</td><td class="skill-calc">[<span id="b_res">30</span>]+[<input id="bon_res" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_res">30</span>%</td></tr>
+                    <tr><td>Void Pathology [INT]</td><td class="skill-calc">[<span id="b_voi">30</span>]+[<input id="bon_voi" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_voi">30</span>%</td></tr>
 
-                    <tr><th>Arcane Suite</th><th>Core + Prof + Free + Rank = Total</th></tr>
-                    <tr><td>Arcane Channeling [INT]</td><td class="skill-calc">[<span id="b_arc">30</span>] + <span class="skill-prof" id="prof_arc">0</span> + [<input id="bon_arc" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_arc" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_arc">30</span>%</td></tr>
-                    <tr><td>Scroll Transcription [INT]</td><td class="skill-calc">[<span id="b_scr">30</span>] + <span class="skill-prof" id="prof_scr">0</span> + [<input id="bon_scr" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_scr" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_scr">30</span>%</td></tr>
-                    <tr><td>Staff Deflection [DEX]</td><td class="skill-calc">[<span id="b_stf">30</span>] + <span class="skill-prof" id="prof_stf">0</span> + [<input id="bon_stf" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_stf" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_stf">30</span>%</td></tr>
-                    <tr><td>Artifact Appraisal [INT]</td><td class="skill-calc">[<span id="b_app">30</span>] + <span class="skill-prof" id="prof_app">0</span> + [<input id="bon_app" type="number" style="width:40px;" value="0" oninput="calcSkills()">] + [<input id="adv_app" type="number" min="0" value="0" oninput="calcSkills()" class="promotion-points">] = <span class="skill-total" id="t_app">30</span>%</td></tr>
+                    <tr><th>Arcane Suite</th><th>Base + Bonus = Total</th></tr>
+                    <tr><td>Arcane Channeling [INT]</td><td class="skill-calc">[<span id="b_arc">30</span>]+[<input id="bon_arc" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_arc">30</span>%</td></tr>
+                    <tr><td>Scroll Transcription [INT]</td><td class="skill-calc">[<span id="b_scr">30</span>]+[<input id="bon_scr" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_scr">30</span>%</td></tr>
+                    <tr><td>Staff Deflection [DEX]</td><td class="skill-calc">[<span id="b_stf">30</span>]+[<input id="bon_stf" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_stf">30</span>%</td></tr>
+                    <tr><td>Artifact Appraisal [INT]</td><td class="skill-calc">[<span id="b_app">30</span>]+[<input id="bon_app" type="number" style="width:40px;" value="0" oninput="calcSkills()">]=<span class="skill-total" id="t_app">30</span>%</td></tr>
                 </table>
-
-                <p class="rule-note">Skill formula: Core + Profession + Free Training + Promotion = Total. The +20/+20/+10 profession package is automatic. Enter only your free training in Bonus (50 points total at creation, max +20 each). The last box is rank-promotion training. Total is capped at 80%.</p>
-                <p class="skill-summary" id="training_summary" aria-live="polite"></p>
 
                 <!-- Combat & Attrition Log -->
                 <h3 class="section-header">Combat & Attrition Log</h3>
                 <div class="attrition-log">
-                    • <b>Attack:</b> Roll equal to or under skill. On a hit, units digit is base damage, capped by weapon Max Damage.<br>
-                    • <b>Critical:</b> Doubles under skill cause maximum weapon damage and one Armor Sunder.<br>
-                    • <b>Wear Tax:</b> Successful melee hits with units digit 2, 3, or 4 normally add a Notch (−1 Max Dmg). At 3 Notches, breaks.
+                    • <b>Attack:</b> Roll under skill. Damage: Units Digit.<br>
+                    • <b>Critical:</b> Max Damage + Armor Sunder to target.<br>
+                    • <b>Wear Tax:</b> Units digit 2, 3, or 4 = Weapon Notch (-1 Dmg).
                 </div>
                 <table class="dossier-table">
                     <tr><th>Weapon / Attack</th><th>Max Dmg</th><th>Notches (-1 each)</th></tr>
@@ -191,25 +172,22 @@
 
                 <!-- Armor & Pathology -->
                 <table class="dossier-table" style="margin-top: 10px;">
-                    <tr><th>Equipment</th><th>DR / Threshold</th><th>Condition Marks</th></tr>
+                    <tr><th>Armor / Shield</th><th>Armor DR / Shield Threshold</th><th>Armor Sunder / Shield Damage</th></tr>
                     <tr><td>Armor: <input id="arm_n" style="width:70%;"></td><td>[<input id="arm_d" style="width:25px;">]</td><td><div class="horizontal-checks">[<input type="checkbox" id="arm_c1">][<input type="checkbox" id="arm_c2">][<input type="checkbox" id="arm_c3">]</div></td></tr>
-                    <tr><td>Shield (Deflection): <input id="shd_n" style="width:70%;"></td><td>[<input id="shd_d" style="width:25px;">]</td><td><div class="horizontal-checks">[<input type="checkbox" id="shd_c1">][<input type="checkbox" id="shd_c2">][<input type="checkbox" id="shd_c3">]</div></td></tr>
+                    <tr><td>Shield: <input id="shd_n" style="width:70%;"></td><td>[<input id="shd_d" style="width:25px;">]</td><td><div class="horizontal-checks">[<input type="checkbox" id="shd_c1">][<input type="checkbox" id="shd_c2">][<input type="checkbox" id="shd_c3">]</div></td></tr>
                 </table>
-                <div style="font-weight: bold; margin-bottom: 10px;">Total Current Armor DR: [ <input id="total_dr" type="number" style="width:45px;" readonly> ]</div>
+                <div style="font-weight: bold; margin-bottom: 10px;">Current ARMOR DR (Shields add no passive DR): [ <input id="total_dr" type="number" style="width:40px;"> ]</div>
 
-                <p class="rule-note">Armor uses DR and 3 sunder marks. The shield box is its <b>splinter threshold</b> (not DR). Shields require an active Shield Deflection reaction. The three shield checkboxes are manual condition markers only.</p>
-                <div class="sheet-row"><label>Subdual damage currently taken:</label><input id="subdual_taken" type="number" min="0" value="0" style="width:65px;"></div>
                 <h3 class="section-header">Pathology & Strain</h3>
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
                     <input type="checkbox" id="path_inf"> <label for="path_inf" class="chk-label"><b style="color:#F26522;">INFECTION:</b> No healing, lose 1 HP daily.</label>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                    <input type="checkbox" id="path_cog"> <label for="path_cog" class="chk-label"><b style="color:#F26522;">COGNITIVE STRAIN:</b> -20% checks, -2 DR, half speed; recover with 4 hours safe rest.</label>
+                    <input type="checkbox" id="path_cog"> <label for="path_cog" class="chk-label"><b style="color:#F26522;">COGNITIVE STRAIN:</b> -20% checks, -2 DR.</label>
                 </div>
                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                    <input type="checkbox" id="path_bli"> <label for="path_bli" class="chk-label"><b style="color:#F26522;">BLINDING DARK:</b> -20% physical actions without light.</label>
+                    <input type="checkbox" id="path_bli"> <label for="path_bli" class="chk-label"><b style="color:#F26522;">BLINDED:</b> -20% physical checks.</label>
                 </div>
-                <div class="sheet-row"><input type="checkbox" id="path_let"><label for="path_let" class="chk-label"><b style="color:#F26522;">LETHARGY:</b> -20% physical checks, half speed; clears after a 1-hour Short Rest and 1 Waterskin charge.</label></div>
             </div>
         </div>
 
@@ -220,12 +198,9 @@
             <div class="sheet-section">
                 <h2 class="dossier-title">Logistics & Inventory</h2>
                 <div class="sheet-row">
-                    <label>Currency:</label> <label>gp</label><input id="inv_gold" type="number" min="0" style="width:60px;" value="0">
-                    <label>sp</label><input id="inv_silver" type="number" min="0" style="width:60px;" value="20">
-                    <label>cp</label><input id="inv_copper" type="number" min="0" style="width:60px;" value="0">
+                    <label>Starting Wealth (Silver Pieces / sp):</label> <input id="inv_gold" type="number" style="width:80px;" value="20">
                 </div>
 
-                <p class="rule-note">New contractors start with 20 sp (not 20 gp), a 12-Slot Basic Backpack, Waterskin, Tinderbox, 3 torches, 7 ration-days, Rank 10 Tag, and their profession tool.</p>
                 <div class="backpack-panel">
                     <div class="sheet-row">
                         <label>Backpack Type:</label>
@@ -271,41 +246,20 @@
                     </div>
                 </div>
 
-                <p class="rule-note" id="inventory_capacity">Basic Backpack has 12 internal Slots. Row count is a writing aid: actual inventory burden depends on each item's printed Slot cost.</p>
                 <table class="dossier-table" style="width: 100%;">
                     <tr><th style="width: 15%;">Slot</th><th>Item Name</th></tr>
-                    <tr><td>1.</td><td><input id="inv_s1" style="width:95%;"></td></tr>
-                    <tr><td>2.</td><td><input id="inv_s2" style="width:95%;"></td></tr>
-                    <tr><td>3.</td><td><input id="inv_s3" style="width:95%;"></td></tr>
-                    <tr><td>4.</td><td><input id="inv_s4" style="width:95%;"></td></tr>
-                    <tr><td>5.</td><td><input id="inv_s5" style="width:95%;"></td></tr>
-                    <tr><td>6.</td><td><input id="inv_s6" style="width:95%;"></td></tr>
-                    <tr><td>7.</td><td><input id="inv_s7" style="width:95%;"></td></tr>
-                    <tr><td>8.</td><td><input id="inv_s8" style="width:95%;"></td></tr>
-                    <tr><td>9.</td><td><input id="inv_s9" style="width:95%;"></td></tr>
-                    <tr><td>10.</td><td><input id="inv_s10" style="width:95%;"></td></tr>
-                    <tr><td>11.</td><td><input id="inv_s11" style="width:95%;"></td></tr>
-                    <tr><td>12.</td><td><input id="inv_s12" style="width:95%;"></td></tr>
-
+                    <script>
+                        for(let i=1; i<=12; i++) {
+                            document.write(`<tr><td>${i}.</td><td><input id="inv_s${i}" style="width:95%;"></td></tr>`);
+                        }
+                    </script>
                 </table>
 
                 <h3 class="section-header">Consumables</h3>
-                <div class="sheet-row"><label style="width:130px;">Torches (1hr):</label><input id="cons_torches" type="number" min="0" style="width:60px;" value="3"></div>
-                <div class="sheet-row"><label style="width:130px;">Iron Rations:</label><input id="cons_rations" type="number" min="0" style="width:60px;" value="7"></div>
-                <div class="sheet-row"><label style="width:130px;">Antidotes:</label><input id="cons_antidote" type="number" min="0" style="width:60px;" value="0"></div>
+                <div class="sheet-row"><label style="width:130px;">Torches (1hr):</label><input id="cons_torches" type="number" style="width:60px;"></div>
+                <div class="sheet-row"><label style="width:130px;">Iron Rations:</label><input id="cons_rations" type="number" style="width:60px;"></div>
+                <div class="sheet-row"><label style="width:130px;">Antidotes:</label><input id="cons_anti" type="number" style="width:60px;"></div>
                 <div class="sheet-row"><label style="width:130px;">Ammunition:</label><input id="cons_ammo" type="number" style="width:60px;"></div>
-                <h3 class="section-header">Waterskins</h3>
-                <div class="sheet-row"><label>Waterskin 1 (5 charges maximum):</label></div>
-                <div class="horizontal-checks water-checks" id="water_charges">
-                    <label><input type="checkbox" id="water_1" checked> 1</label>
-                    <label><input type="checkbox" id="water_2" checked> 2</label>
-                    <label><input type="checkbox" id="water_3" checked> 3</label>
-                    <label><input type="checkbox" id="water_4" checked> 4</label>
-                    <label><input type="checkbox" id="water_5" checked> 5</label>
-                    <strong id="water_count">5/5</strong>
-                </div>
-                <p class="rule-note">Spend a charge ONLY when a recovery or hazard rule specifically requires water. No automatic daily water cost. Refill from suitable clean water.</p>
-                <div class="sheet-row"><label>Additional Waterskins / charges:</label><textarea id="additional_waterskins" rows="2" placeholder="Waterskin 2: 4/5"></textarea></div>
             </div>
         </div>
 
@@ -315,30 +269,22 @@
         <div id="tab_magic" class="app-tab">
             <div class="sheet-section">
                 <h3 class="section-header" style="margin-top:0;">Grimoire & Sacred Manifest</h3>
-                <div class="sheet-row"><label>Discipline:</label>
-                    <select id="caster_disc" onchange="calcSpellCapacity()"><option value="none">Non-caster</option><option value="arcane">Arcane (INT)</option><option value="sanctified">Sanctified (WIS)</option></select>
-                </div>
                 <div class="sheet-row">
-                    <label>Daily Slots:</label> <input id="spl_max" type="number" style="width:50px;" readonly>
+                    <label>Daily Slots:</label> <input id="spl_max" type="number" style="width:40px;">
                     <label>Available:</label> 
                     <div class="horizontal-checks">
-                        [<input type="checkbox" id="sp_s1">] [<input type="checkbox" id="sp_s2">] [<input type="checkbox" id="sp_s3">] [<input type="checkbox" id="sp_s4">] [<input type="checkbox" id="sp_s5">] [<input type="checkbox" id="sp_s6">] [<input type="checkbox" id="sp_s7">] [<input type="checkbox" id="sp_s8">] [<input type="checkbox" id="sp_s9">] [<input type="checkbox" id="sp_s10">]
+                        [<input type="checkbox" id="sp_s1">][<input type="checkbox" id="sp_s2">][<input type="checkbox" id="sp_s3">][<input type="checkbox" id="sp_s4">]
                     </div>
                 </div>
                 
-                <p class="rule-note">Daily spell slots = tens digit of INT (Arcane) or WIS (Sanctified). Level 0 spells require no daily slot. Only checked slots are available. Recover on safe overnight rest.</p>
-                <b style="color:#ccc; font-size:13px;">Cantrips & Minor Rites (8 Recorded Entries):</b>
+                <b style="color:#ccc; font-size:13px;">Cantrips & Minor Rites (8 Slots):</b>
                 <table class="dossier-table">
-                    <tr><th>#</th><th>Spell Name</th><th>Format</th><th>Effect / Notes</th></tr>
-                    <tr><td>1.</td><td><input id="can1_n" style="width:90%;"></td><td><input id="can1_f" style="width:90%;"></td><td><input id="can1_e" style="width:90%;"></td></tr>
-                    <tr><td>2.</td><td><input id="can2_n" style="width:90%;"></td><td><input id="can2_f" style="width:90%;"></td><td><input id="can2_e" style="width:90%;"></td></tr>
-                    <tr><td>3.</td><td><input id="can3_n" style="width:90%;"></td><td><input id="can3_f" style="width:90%;"></td><td><input id="can3_e" style="width:90%;"></td></tr>
-                    <tr><td>4.</td><td><input id="can4_n" style="width:90%;"></td><td><input id="can4_f" style="width:90%;"></td><td><input id="can4_e" style="width:90%;"></td></tr>
-                    <tr><td>5.</td><td><input id="can5_n" style="width:90%;"></td><td><input id="can5_f" style="width:90%;"></td><td><input id="can5_e" style="width:90%;"></td></tr>
-                    <tr><td>6.</td><td><input id="can6_n" style="width:90%;"></td><td><input id="can6_f" style="width:90%;"></td><td><input id="can6_e" style="width:90%;"></td></tr>
-                    <tr><td>7.</td><td><input id="can7_n" style="width:90%;"></td><td><input id="can7_f" style="width:90%;"></td><td><input id="can7_e" style="width:90%;"></td></tr>
-                    <tr><td>8.</td><td><input id="can8_n" style="width:90%;"></td><td><input id="can8_f" style="width:90%;"></td><td><input id="can8_e" style="width:90%;"></td></tr>
-
+                    <tr><th>#</th><th>Spell Name</th><th>Format</th></tr>
+                    <script>
+                        for(let i=1; i<=8; i++) {
+                            document.write(`<tr><td>${i}.</td><td><input id="can${i}_n" style="width:90%;"></td><td><input id="can${i}_f" style="width:90%;"></td></tr>`);
+                        }
+                    </script>
                 </table>
 
                 <div class="sheet-row" style="margin-top:10px;">
@@ -348,41 +294,13 @@
                         <option value="30">Grimoire (30 Pages)</option>
                     </select>
                 </div>
-                <p class="rule-note">A folio holds 10 <b>pages</b>, a grimoire 30. Level 0/1 inscriptions take 1 page; Level 2 takes 2; Level 3 takes 3. Entries remain listed while swapping books.</p>
-                <p class="skill-summary" id="spell_page_summary" aria-live="polite"></p>
                 <table class="dossier-table" id="masterSpellTable">
-                    <tr><th>Entry</th><th>Lvl</th><th>Spell Name</th><th>Pages</th><th>Notes</th></tr>
-                    <tr id="grim_row_1"><td>1.</td><td><input id="lib1_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib1_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib1_p" style="width:55px;" readonly></td><td><input id="lib1_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_2"><td>2.</td><td><input id="lib2_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib2_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib2_p" style="width:55px;" readonly></td><td><input id="lib2_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_3"><td>3.</td><td><input id="lib3_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib3_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib3_p" style="width:55px;" readonly></td><td><input id="lib3_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_4"><td>4.</td><td><input id="lib4_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib4_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib4_p" style="width:55px;" readonly></td><td><input id="lib4_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_5"><td>5.</td><td><input id="lib5_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib5_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib5_p" style="width:55px;" readonly></td><td><input id="lib5_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_6"><td>6.</td><td><input id="lib6_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib6_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib6_p" style="width:55px;" readonly></td><td><input id="lib6_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_7"><td>7.</td><td><input id="lib7_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib7_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib7_p" style="width:55px;" readonly></td><td><input id="lib7_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_8"><td>8.</td><td><input id="lib8_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib8_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib8_p" style="width:55px;" readonly></td><td><input id="lib8_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_9"><td>9.</td><td><input id="lib9_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib9_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib9_p" style="width:55px;" readonly></td><td><input id="lib9_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_10"><td>10.</td><td><input id="lib10_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib10_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib10_p" style="width:55px;" readonly></td><td><input id="lib10_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_11"><td>11.</td><td><input id="lib11_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib11_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib11_p" style="width:55px;" readonly></td><td><input id="lib11_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_12"><td>12.</td><td><input id="lib12_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib12_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib12_p" style="width:55px;" readonly></td><td><input id="lib12_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_13"><td>13.</td><td><input id="lib13_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib13_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib13_p" style="width:55px;" readonly></td><td><input id="lib13_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_14"><td>14.</td><td><input id="lib14_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib14_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib14_p" style="width:55px;" readonly></td><td><input id="lib14_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_15"><td>15.</td><td><input id="lib15_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib15_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib15_p" style="width:55px;" readonly></td><td><input id="lib15_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_16"><td>16.</td><td><input id="lib16_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib16_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib16_p" style="width:55px;" readonly></td><td><input id="lib16_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_17"><td>17.</td><td><input id="lib17_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib17_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib17_p" style="width:55px;" readonly></td><td><input id="lib17_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_18"><td>18.</td><td><input id="lib18_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib18_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib18_p" style="width:55px;" readonly></td><td><input id="lib18_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_19"><td>19.</td><td><input id="lib19_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib19_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib19_p" style="width:55px;" readonly></td><td><input id="lib19_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_20"><td>20.</td><td><input id="lib20_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib20_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib20_p" style="width:55px;" readonly></td><td><input id="lib20_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_21"><td>21.</td><td><input id="lib21_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib21_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib21_p" style="width:55px;" readonly></td><td><input id="lib21_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_22"><td>22.</td><td><input id="lib22_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib22_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib22_p" style="width:55px;" readonly></td><td><input id="lib22_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_23"><td>23.</td><td><input id="lib23_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib23_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib23_p" style="width:55px;" readonly></td><td><input id="lib23_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_24"><td>24.</td><td><input id="lib24_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib24_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib24_p" style="width:55px;" readonly></td><td><input id="lib24_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_25"><td>25.</td><td><input id="lib25_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib25_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib25_p" style="width:55px;" readonly></td><td><input id="lib25_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_26"><td>26.</td><td><input id="lib26_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib26_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib26_p" style="width:55px;" readonly></td><td><input id="lib26_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_27"><td>27.</td><td><input id="lib27_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib27_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib27_p" style="width:55px;" readonly></td><td><input id="lib27_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_28"><td>28.</td><td><input id="lib28_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib28_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib28_p" style="width:55px;" readonly></td><td><input id="lib28_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_29"><td>29.</td><td><input id="lib29_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib29_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib29_p" style="width:55px;" readonly></td><td><input id="lib29_s" style="width:90%;"></td></tr>
-                    <tr id="grim_row_30"><td>30.</td><td><input id="lib30_l" type="number" min="0" max="3" oninput="updateSpellPages()" style="width:60px;"></td><td><input id="lib30_n" oninput="updateSpellPages()" style="width:90%;"></td><td><input id="lib30_p" style="width:55px;" readonly></td><td><input id="lib30_s" style="width:90%;"></td></tr>
-
+                    <tr><th>Slot</th><th>Lvl</th><th>Spell Name</th><th>Pg</th></tr>
+                    <script>
+                        for(let i=1; i<=30; i++) {
+                            document.write(`<tr id="grim_row_${i}"><td>${i}.</td><td><input id="lib${i}_l" style="width:70%;"></td><td><input id="lib${i}_n" style="width:90%;"></td><td><input id="lib${i}_p" style="width:70%;"></td></tr>`);
+                        }
+                    </script>
                 </table>
             </div>
         </div>
@@ -432,6 +350,6 @@
         </div>
     </div>
 
-    <script src="phonescripts.js"></script>
+    <script src="JAVA phone scripts.js"></script>
 </body>
 </html>
